@@ -14,8 +14,7 @@
 
 \section{Inleiding}%
 \label{sec:inleiding}
-
-Binnen de Arcelor Mittal Gent bestaan er veel verschillende processen die verdeeld zijn over verschillende afdelingen.
+Binnen de Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
 Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
 Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
 Dit zorgt ervoor dat iedere stap zijn invloed heeft op de kwaliteit van het eindresultaat.
@@ -25,14 +24,23 @@ Omdat deze afdelingen zeer specifieke processen hebben, hebben ze ook zeer speci
 Dit maakt analyse of onderzoek over afdelingen heen zeer complex en tijdsrovend.
 
 De scope van deze bachelorproef is tweedelig, waarbij deel één eruit bestaat om samen met Tracked vanuit een gestandariseerd datamodel die zichtbaarheid events bijhoudt om te zetten naar een grafiekmodel.
-Deel twee bouwt verder voort op dit grafiekmodel om dan een LLM te trainen die eenvoudig informatie eruit kan halen en teruggeven.
+Deel twee bouwt verder voort op dit grafiekmodel om dan een LLM (large language model) te trainen die eenvoudig informatie eruit kan halen en teruggeven.
+
+De centrale vraag die hier gesteld wordt is: \enquote{Hoe kunnen we efficiënt en snel grafiekmodellering toepassen om een LLM te ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten?}
 %---------- Stand van zaken ---------------------------------------------------
 
 \section{Literatuurstudie}%
 \label{sec:literatuurstudie}
 
-\subsection{CosmosDB}
-\subsubsection{Waarom CosmosDB gebruiken}
+\subsection{Cosmos DB}%
+\subsubsection{Waarom Cosmos DB gebruiken}
+Cosmos DB is een NoSQL-database van microsoft, deze heeft een lage latentie, multi-query-api die makkelijk grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020} wat zeer belangrijk is in ons project.
+Naast deze feiten is CosmosDB horizontaal schaalbaar wat betekent dat we op hoogtepunten een miljoen lees-/schrijfaanvragen kunnen verwerken door het nodige aantal servers toe te voegen.
+De hoge beschikbaarheid wordt gegarandeerd door replicatie waardoor we snel kunnen overschakelen als er iets fout gaat in de database.
+
+\subsubsection{Grafiek modellering}
+Cosmos DB biedt ook grafiek modellering aan met behulp van Gremlin
+
 
 
 
