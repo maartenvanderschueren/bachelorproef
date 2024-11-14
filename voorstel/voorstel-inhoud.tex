@@ -16,30 +16,35 @@
 \label{sec:inleiding}
 
 Binnen de Arcelor Mittal Gent bestaan er veel verschillende processen die verdeeld zijn over verschillende afdelingen.
-Iedere afdeling heeft een deel van het proces om van grondstof tot een afgewerkt product te raken. 
-Hierbij is het zo dat tussen iedere afdeling een deel is van de toeleveringsketting waarbij het resultaat van de ene afdeling de start is van de andere afdeling.
-Waarbij dat iedere stap zijn invloed kan hebben op de kwaliteit van het eindresultaat.
+Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
+Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
+Dit zorgt ervoor dat iedere stap zijn invloed heeft op de kwaliteit van het eindresultaat.
 
-Iedere afdeling is gemaakt rond een specifiek proces zoals hoogoven die van ruwe grondstoffen naar ruw ijzer gaat en de staalfabriek die van ruw ijzer naar staal gaat.
-Omdat deze afdelingen zeer specifieke processen hebben, hebben ze ook zeer specifieke noden en datamodellen.
-Dit zorgt ervoor dat analyse of onderzoek over afdelingen heen zeer complex wordt en tijdsrovend is.
+Elke afdeling is opgebouwd rond een specifiek proces, zoals de hoogoven die ruwe grondstoffen omzet in ruw ijzer en de staalfabriek die ruw ijzer in staal verandert.
+Omdat deze afdelingen zeer specifieke processen hebben, hebben ze ook zeer specifieke behoeften en datamodellen.
+Dit maakt analyse of onderzoek over afdelingen heen zeer complex en tijdsrovend.
 
-De scope van deze bachelorproef bestaat is tweedelig waarbij deel één eruit bestaat om samen met Tracked vanuit een gestandariseerd datamodel die zichtbaarheid events bijhoudt om te zetten naar een graphmodel.
-Deel twee bouwt verder op dit graphmodel om dan een LLM te trainen om eenvoudig informatie hieruit te krijgen en terug te geven.
+De scope van deze bachelorproef is tweedelig, waarbij deel één eruit bestaat om samen met Tracked vanuit een gestandariseerd datamodel die zichtbaarheid events bijhoudt om te zetten naar een grafiekmodel.
+Deel twee bouwt verder voort op dit grafiekmodel om dan een LLM te trainen die eenvoudig informatie eruit kan halen en teruggeven.
 %---------- Stand van zaken ---------------------------------------------------
 
 \section{Literatuurstudie}%
 \label{sec:literatuurstudie}
 
-Hier beschrijf je de \emph{state-of-the-art} rondom je gekozen onderzoeksdomein, d.w.z.\ een inleidende, doorlopende tekst over het onderzoeksdomein van je bachelorproef. Je steunt daarbij heel sterk op de professionele \emph{vakliteratuur}, en niet zozeer op populariserende teksten voor een breed publiek. Wat is de huidige stand van zaken in dit domein, en wat zijn nog eventuele open vragen (die misschien de aanleiding waren tot je onderzoeksvraag!)?
+\subsection{CosmosDB}
+\subsubsection{Waarom CosmosDB gebruiken}
 
-Je mag de titel van deze sectie ook aanpassen (literatuurstudie, stand van zaken, enz.). Zijn er al gelijkaardige onderzoeken gevoerd? Wat concluderen ze? Wat is het verschil met jouw onderzoek?
 
-Verwijs bij elke introductie van een term of bewering over het domein naar de vakliteratuur, bijvoorbeeld~\autocite{Hykes2013}! Denk zeker goed na welke werken je refereert en waarom.
 
-Draag zorg voor correcte literatuurverwijzingen! Een bronvermelding hoort thuis \emph{binnen} de zin waar je je op die bron baseert, dus niet er buiten! Maak meteen een verwijzing als je gebruik maakt van een bron. Doe dit dus \emph{niet} aan het einde van een lange paragraaf. Baseer nooit teveel aansluitende tekst op eenzelfde bron.
+% Hier beschrijf je de \emph{state-of-the-art} rondom je gekozen onderzoeksdomein, d.w.z.\ een inleidende, doorlopende tekst over het onderzoeksdomein van je bachelorproef. Je steunt daarbij heel sterk op de professionele \emph{vakliteratuur}, en niet zozeer op populariserende teksten voor een breed publiek. Wat is de huidige stand van zaken in dit domein, en wat zijn nog eventuele open vragen (die misschien de aanleiding waren tot je onderzoeksvraag!)?
 
-Als je informatie over bronnen verzamelt in JabRef, zorg er dan voor dat alle nodige info aanwezig is om de bron terug te vinden (zoals uitvoerig besproken in de lessen Research Methods).
+% Je mag de titel van deze sectie ook aanpassen (literatuurstudie, stand van zaken, enz.). Zijn er al gelijkaardige onderzoeken gevoerd? Wat concluderen ze? Wat is het verschil met jouw onderzoek?
+
+% Verwijs bij elke introductie van een term of bewering over het domein naar de vakliteratuur, bijvoorbeeld~\autocite{Hykes2013}! Denk zeker goed na welke werken je refereert en waarom.
+
+% Draag zorg voor correcte literatuurverwijzingen! Een bronvermelding hoort thuis \emph{binnen} de zin waar je je op die bron baseert, dus niet er buiten! Maak meteen een verwijzing als je gebruik maakt van een bron. Doe dit dus \emph{niet} aan het einde van een lange paragraaf. Baseer nooit teveel aansluitende tekst op eenzelfde bron.
+
+% Als je informatie over bronnen verzamelt in JabRef, zorg er dan voor dat alle nodige info aanwezig is om de bron terug te vinden (zoals uitvoerig besproken in de lessen Research Methods).
 
 % Voor literatuurverwijzingen zijn er twee belangrijke commando's:
 % \autocite{KEY} => (Auteur, jaartal) Gebruik dit als de naam van de auteur
@@ -53,8 +58,8 @@ Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur v
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
-- Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
-- Tweede fase -> Aanleren copilot studio (microsoft) en hoe linken met graph en chatbot maken.
+% - Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
+% - Tweede fase -> Aanleren copilot studio (microsoft) en hoe linken met graph en chatbot maken.
 
 % Hier beschrijf je hoe je van plan bent het onderzoek te voeren. Welke onderzoekstechniek ga je toepassen om elk van je onderzoeksvragen te beantwoorden? Gebruik je hiervoor literatuurstudie, interviews met belanghebbenden (bv.~voor requirements-analyse), experimenten, simulaties, vergelijkende studie, risico-analyse, PoC, \ldots?
 
@@ -72,9 +77,11 @@ Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur v
 \section{Verwacht resultaat, conclusie}%
 \label{sec:verwachte_resultaten}
 
-- Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
-- Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
-BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
+% - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
+% - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
+% BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
+
+
 % Hier beschrijf je welke resultaten je verwacht. Als je metingen en simulaties uitvoert, kan je hier al mock-ups maken van de grafieken samen met de verwachte conclusies. Benoem zeker al je assen en de onderdelen van de grafiek die je gaat gebruiken. Dit zorgt ervoor dat je concreet weet welk soort data je moet verzamelen en hoe je die moet meten.
 
 % Wat heeft de doelgroep van je onderzoek aan het resultaat? Op welke manier zorgt jouw bachelorproef voor een meerwaarde?
