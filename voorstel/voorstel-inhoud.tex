@@ -26,7 +26,7 @@ Dit maakt analyse of onderzoek over afdelingen heen zeer complex en tijdsrovend.
 De scope van deze bachelorproef is tweedelig, waarbij deel één eruit bestaat om samen met Tracked vanuit een gestandariseerd datamodel die zichtbaarheid events bijhoudt om te zetten naar een grafiekmodel.
 Deel twee bouwt verder voort op dit grafiekmodel om dan een LLM (large language model) te trainen die eenvoudig informatie eruit kan halen en teruggeven.
 
-De centrale vraag die hier gesteld wordt is: \enquote{Hoe kunnen we efficiënt en snel grafiekmodellering toepassen om een LLM te ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten?}
+De centrale vraag die hier gesteld wordt is: ``Hoe we efficiënt en snel grafiekmodellering kunnen toepassen om een LLM te ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten.``
 %---------- Stand van zaken ---------------------------------------------------
 
 \section{Literatuurstudie}%
@@ -38,9 +38,26 @@ Cosmos DB is een NoSQL-database van microsoft, deze heeft een lage latentie, mul
 Naast deze feiten is CosmosDB horizontaal schaalbaar wat betekent dat we op hoogtepunten een miljoen lees- en schrijfaanvragen kunnen verwerken door het nodige aantal servers toe te voegen.
 De hoge beschikbaarheid wordt gegarandeerd door replicatie waardoor we snel kunnen overschakelen als er iets fout gaat in de database.
 
-\subsubsection{Grafiek modellering}
-Cosmos DB biedt ook grafiek modellering aan met behulp van Gremlin
+\subsection{Grafiek modellering}
+Cosmos DB biedt ook grafiek modellering aan met behulp van Gremlin. Gremlin is een grafiek database service waarbij we grote grafieken kunnen opslaan die bestaan uit vertices en edges \autocite{Microsoft2024}.
+Dit gebeurt met een snelheid van miliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten.
+Ook is Gremlin schaalbaar en kan de consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie.
+Binnen zo een grafiek model hebben we Vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die verplaatst wordt van A naar B.
 
+\subsubsection{Verschil transformatie en aggregatie}
+Binnen ons project kunnen bestaansvormen van de producten veranderen. Zo hebben we transformatie waarbij de cokes bijvoorbeeld omgezet worden in vloeibaar staal, dit is niet omkeerbaar.
+Bij aggregatie kunnen we terug naar de oorspronkelijke bestaandsvorm zoals bijvoorbeeld van warmwalserij naar koudwalserij waarbij de platen dunner worden en eventueel een roestvrije laag krijgen \autocite{ArcelorMittal2024}.
+In onze grafiek modellering moeten we gebruik maken van tijdelijke edges om ook terug te kunnen kijken naar wat voor het transformatie- of aggregatieproces gebeurd is om anomalieën terug te vinden \autocite{JaewookByun2020}.
+
+
+\subsection{EPCIS}
+Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
+Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te delen \autocite{Devins}.
+``Met behulp van deze waarden kunnen we real-life objecten omzetten in elektronisch opgeslagen informatie, waarna we dit kunnen communiceren met eindgebruikers.`` zegt \textcite{Devins}.
+Door deze normen toe te passen kunnen we de traceerbaarheid van het product per proces garanderen inclusief de gewenste parameters die opgeslagen worden in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
+\subsubsection{Waarom EPCIS?}
+Huidige Legacy Systemen maken gebruik van ERP, POS, WMS,\dots Vaak lopen deze niet real-time wat nadelig is als we direct iets willen weten over een product en hoge beschikbaarheid verwachten \autocite{Vieweger}.
+Doordat iedereen eenzelfde norm gebruikt kunnen we dit schaalbaar houden en makkelijk uitbereiden.
 
 
 
@@ -61,12 +78,21 @@ Cosmos DB biedt ook grafiek modellering aan met behulp van Gremlin
 %   functie heeft in de zin (bv. ``Uit onderzoek door Doll & Hill (1954) bleek
 %   ...'')
 
-Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur van de tekst kan verduidelijken.
+% Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur van de tekst kan verduidelijken.
 
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
-TODO
+Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van Arcelor Mittal waar events in opgeslagen staan.
+Daarna zetten we dit om naar Cosmos DB en kunnen we via Grammlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
+Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks anders was of fout is gelopen.
+
+Dit grafiekmodel moet ook voldoen aan de normen volgens EPCIS en schaalbaar zijn, daarom gaan we zorgen dat de gebruikte data binnen het grafiekmodel zoals een node een id krijgt in de plaats van een statische naam.
+Daardoor kan Tracked in latere fases of andere business cases dezelfde technieken gebruiken zonder veel aanpassingen te moeten doen op grote schaal.
+
+Zodra we een duidelijk grafiekmodel hebben waarmee we makkelijk in het verleden kunnen kijken, kunnen we dit trainen met copilot van microsoft.
+Daardoor kunnen we dan snel zoeken naar waar mogelijks anomalieën zijn in een proces door te vergelijken met andere batches die hetzelfde proces hebben doorlopen.
+Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor onder andere microsoft teams waarbij iemand van de klantenservice kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er mogelijks een fout is geweest in het proces.
 % - Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
 % - Tweede fase -> Aanleren copilot studio (microsoft) en hoe linken met graph en chatbot maken.
 
@@ -85,7 +111,11 @@ TODO
 %---------- Verwachte resultaten ----------------------------------------------
 \section{Verwacht resultaat, conclusie}%
 \label{sec:verwachte_resultaten}
-TODO
+In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk is om uit te bereiden naar bijvoorbeeld een planningstool om de meest efficiënte route te zoeken.
+Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
+Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
+Ik hoop ook dat we dit schaalbaar kunnen opstellen en performant kunnen houden waardoor het ook kan gebruikt worden op landelijk of internationaal niveau.
+Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) optimaliseren
 % - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
 % - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
 % BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
