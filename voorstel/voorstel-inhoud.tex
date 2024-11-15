@@ -11,9 +11,10 @@
 % kader van het vak Research Methods dat ik (vorig/dit) academiejaar heb
 % uitgewerkt (met medesturent VOORNAAM NAAM als mede-auteur).
 % 
-
 \section{Inleiding}%
 \label{sec:inleiding}
+Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen in de industrie, en gaan we aan de slag met traceringsdata van Arcelor Mittal Gent.
+
 Binnen Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
 Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
 Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
@@ -28,12 +29,10 @@ Deel twee bouwt verder voort op dit grafiekmodel om dan een LLM (large language 
 
 De centrale vraag die hier gesteld wordt is: ``Hoe we efficiënt en snel grafiekmodellering kunnen toepassen om een LLM te ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten.``
 %---------- Stand van zaken ---------------------------------------------------
-
 \section{Literatuurstudie}%
 \label{sec:literatuurstudie}
 
 \subsection{Cosmos DB}%
-\subsubsection{Waarom Cosmos DB gebruiken}
 Cosmos DB is een NoSQL-database van microsoft.Het biedt een lage latentie, multi-query-api die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
 Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen.
 De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
@@ -50,7 +49,7 @@ Binnen ons project kunnen de bestaansvormen van producten veranderen. Zo hebben 
 Daarnaast hebben we aggregatie waarbij we wel terug naar de oorspronkelijke vorm zouden kunnen gaan indien nodig.
 In onze grafiekmodellering moeten we gebruik maken van tijdelijke edges om ook terug te kunnen kijken naar wat voor het transformatie- of aggregatieproces gebeurd is, om zo anomalieën terug te vinden \autocite{JaewookByun2020}.
 
-\subsection{Retrieval Augmented Generation (RAG)}
+\subsection{Retrieval Augmented Generation}
 Om onze chatbot te optimaliseren gaan we gebruik maken van RAG.
 Dit zorgt ervoor dat de antwoorden die de chatbot zal geven niet out-dated zijn en een geldige bron bevatten (zoals onze eigen data) \autocite{IBM2023}.
 Binnen een LLM waarbij je RAG gebruikt zal de user een prompt geven, daarna gaat het LLM vragen aan RAG om alle bronnen (data) te geven over het gevraagde onderwerp.
@@ -63,7 +62,6 @@ Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en g
 Daarnaast zegt \textcite{IBM2024}, hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken.
 Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs tot overfitting raken waarbij de trainingsdata goed presteerd maar ongeziene data niet zegt \textcite{EASIIO2022}.
 Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit omdat Arcelor Mittal veel vakjargon heeft zoals cokes, slabs,\dots waarmee we ons model kunnen specialiseren en de data die we gebruiken specifiek en up-to-date moet zijn om van elk moment op de hoogte te blijven.
-
 
 \subsection{EPCIS}
 Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
@@ -94,12 +92,12 @@ Doordat elk bedrijf eenzelfde norm gebruikt kunnen we dit schaalbaar houden en m
 %   ...'')
 
 % Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur van de tekst kan verduidelijken.
-
+\newpage
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
 Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van Arcelor Mittal waar events in opgeslagen staan.
-Daarna zetten we dit om naar Cosmos DB en kunnen we via Gremlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
+Daarna zetten we dit om naar Cosmos DB (de door Tracked gebruikte database service) en kunnen we via Gremlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
 Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks anders was of fout is gelopen.
 
 Dit grafiekmodel moet ook voldoen aan de normen volgens EPCIS en schaalbaar zijn, daarom gaan we zorgen dat de gebruikte data binnen het grafiekmodel zoals een node een id krijgt in de plaats van een statische naam.
@@ -109,6 +107,8 @@ Zodra we een duidelijk grafiekmodel hebben waarmee we makkelijk in het verleden 
 Daarna gaan we op zoek naar de beste methode om dit te implementeren met onder andere hulp van de RAG methode en finetuning. Daarnaast gaan we ook nog op zoek naar een geschikt zoekalgoritme om zo snel mogelijk op de juiste data terecht te komen.
 Daardoor kunnen we dan snel zoeken naar waar mogelijks anomalieën zijn in een proces door te vergelijken met andere batches die hetzelfde proces hebben doorlopen.
 Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor onder andere microsoft teams waarbij iemand van de klantenservice kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er mogelijks een fout is geweest in het proces.
+
+
 % - Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
 % - Tweede fase -> Aanleren copilot studio (microsoft) en hoe linken met graph en chatbot maken.
 
@@ -132,6 +132,11 @@ Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een
 Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
 Ik hoop ook dat we dit schaalbaar kunnen opstellen en performant kunnen houden waardoor het ook kan gebruikt worden op landelijk of internationaal niveau.
 Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) kunnen optimaliseren
+\begin{figure}[h!]
+    \centering
+    \includegraphics{../graphics/flowchart.png}
+    \caption{\label{fig:chart}Flowchart}
+\end{figure}
 % - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
 % - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
 % BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
