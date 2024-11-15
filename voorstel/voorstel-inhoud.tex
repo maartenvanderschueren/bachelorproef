@@ -14,7 +14,7 @@
 
 \section{Inleiding}%
 \label{sec:inleiding}
-Binnen de Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
+Binnen Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
 Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
 Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
 Dit zorgt ervoor dat iedere stap zijn invloed heeft op de kwaliteit van het eindresultaat.
@@ -34,25 +34,40 @@ De centrale vraag die hier gesteld wordt is: ``Hoe we efficiënt en snel grafiek
 
 \subsection{Cosmos DB}%
 \subsubsection{Waarom Cosmos DB gebruiken}
-Cosmos DB is een NoSQL-database van microsoft, deze heeft een lage latentie, multi-query-api die makkelijk grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020} wat zeer belangrijk is in ons project.
-Naast deze feiten is CosmosDB horizontaal schaalbaar wat betekent dat we op hoogtepunten een miljoen lees- en schrijfaanvragen kunnen verwerken door het nodige aantal servers toe te voegen.
-De hoge beschikbaarheid wordt gegarandeerd door replicatie waardoor we snel kunnen overschakelen als er iets fout gaat in de database.
+Cosmos DB is een NoSQL-database van microsoft.Het biedt een lage latentie, multi-query-api die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
+Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen.
+De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
 
 \subsection{Grafiek modellering}
-Cosmos DB biedt ook grafiek modellering aan met behulp van Gremlin. Gremlin is een grafiek database service waarbij we grote grafieken kunnen opslaan die bestaan uit vertices en edges \autocite{Microsoft2024}.
-Dit gebeurt met een snelheid van miliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten.
-Ook is Gremlin schaalbaar en kan de consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie.
-Binnen zo een grafiek model hebben we Vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die verplaatst wordt van A naar B.
+In een grafiekdatabase slaan we gegevens op in de vorm van verices (knopen) en relaties (edges), hierdoor kunnen we complexe verbanden leggen zoals in ons geval de productieprocessen.
+Cosmos DB ondersteunt ook grafiekmodellering aan met behulp van Gremlin API. Gremlin is gebasseerd op Apache tinkerpop's Gremlin, dit is een krachtig grafiekverwerkingsframework waarbij we grote grafieken kunnen opslaan, modelleren en doorzoeken via gremlin traversal language \autocite{Microsoft2024}.
+Dit gebeurt met een snelheid van milliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten.
+Daarnaast is Gremlin ook schaalbaar en kan het consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie.
+Binnen zo'n grafiek model hebben we Vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die wordt verplaatst van A naar B.
 
 \subsubsection{Verschil transformatie en aggregatie}
-Binnen ons project kunnen bestaansvormen van de producten veranderen. Zo hebben we transformatie waarbij de cokes bijvoorbeeld omgezet worden in vloeibaar staal, dit is niet omkeerbaar.
-Bij aggregatie kunnen we terug naar de oorspronkelijke bestaandsvorm zoals bijvoorbeeld van warmwalserij naar koudwalserij waarbij de platen dunner worden en eventueel een roestvrije laag krijgen \autocite{ArcelorMittal2024}.
-In onze grafiek modellering moeten we gebruik maken van tijdelijke edges om ook terug te kunnen kijken naar wat voor het transformatie- of aggregatieproces gebeurd is om anomalieën terug te vinden \autocite{JaewookByun2020}.
+Binnen ons project kunnen de bestaansvormen van producten veranderen. Zo hebben we transformatie, dit is een deel van het proces waarbij de verandering van het product onomkeerbaar is.
+Daarnaast hebben we aggregatie waarbij we wel terug naar de oorspronkelijke vorm zouden kunnen gaan indien nodig.
+In onze grafiekmodellering moeten we gebruik maken van tijdelijke edges om ook terug te kunnen kijken naar wat voor het transformatie- of aggregatieproces gebeurd is, om zo anomalieën terug te vinden \autocite{JaewookByun2020}.
+
+\subsection{Retrieval Augmented Generation (RAG)}
+Om onze chatbot te optimaliseren gaan we gebruik maken van RAG.
+Dit zorgt ervoor dat de antwoorden die de chatbot zal geven niet out-dated zijn en een geldige bron bevatten (zoals onze eigen data) \autocite{IBM2023}.
+Binnen een LLM waarbij je RAG gebruikt zal de user een prompt geven, daarna gaat het LLM vragen aan RAG om alle bronnen (data) te geven over het gevraagde onderwerp.
+Zodra hij jouw prompt samen heeft gevoegd met de data die erover beschikbaar is geeft hij een correct antwoord terug.
+In ons geval kunnen we bijvoorbeeld vragen waar de container staal was op een bepaalde datum, en op dat moment vraagt het LLM aan RAG alle informatie over die container waarna hij een geschikt antwoord kan geven.
+Deze mehtode wordt ook gebruikt in onder andere ChatGPT en andere LLM's om ervoor te zorgen dat je het model zelf niet herhaaldelijk moet trainen, maar een up-to-date dataset aan koppelt.
+Kort gezegd is RAG een AI framework dat data gebruikt buiten zijn eigen getrainde data om te voorkomen dat je het model moet blijven updaten.
+\subsubsection{RAG vs Finetuning}
+Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en geldige bronnen gebruikt. Dit is voordelig in ons project omdat er dagelijks heel veel staal geproduceerd wordt en dus veel verschillende processen zijn.
+Daarnaast zegt \textcite{IBM2024}, hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken.
+Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs tot overfitting raken waarbij de trainingsdata goed presteerd maar ongeziene data niet zegt \textcite{EASIIO2022}.
+Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit omdat Arcelor Mittal veel vakjargon heeft zoals cokes, slabs,\dots en de data die we gebruiken specifiek en up-to-date moet zijn om van elk moment op de hoogte te blijven.
 
 
 \subsection{EPCIS}
 Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
-Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te delen \autocite{Devins}.
+Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te delen binnen en buiten het bedrijf \autocite{Devins}.
 ``Met behulp van deze waarden kunnen we real-life objecten omzetten in elektronisch opgeslagen informatie, waarna we dit kunnen communiceren met eindgebruikers.`` zegt \textcite{Devins}.
 Door deze normen toe te passen kunnen we de traceerbaarheid van het product per proces garanderen inclusief de gewenste parameters die opgeslagen worden in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
 \subsubsection{Waarom EPCIS?}
@@ -84,13 +99,14 @@ Doordat iedereen eenzelfde norm gebruikt kunnen we dit schaalbaar houden en makk
 \section{Methodologie}%
 \label{sec:methodologie}
 Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van Arcelor Mittal waar events in opgeslagen staan.
-Daarna zetten we dit om naar Cosmos DB en kunnen we via Grammlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
+Daarna zetten we dit om naar Cosmos DB en kunnen we via Gremlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
 Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks anders was of fout is gelopen.
 
 Dit grafiekmodel moet ook voldoen aan de normen volgens EPCIS en schaalbaar zijn, daarom gaan we zorgen dat de gebruikte data binnen het grafiekmodel zoals een node een id krijgt in de plaats van een statische naam.
 Daardoor kan Tracked in latere fases of andere business cases dezelfde technieken gebruiken zonder veel aanpassingen te moeten doen op grote schaal.
 
 Zodra we een duidelijk grafiekmodel hebben waarmee we makkelijk in het verleden kunnen kijken, kunnen we dit trainen met copilot van microsoft.
+Daarna gaan we op zoek naar de beste methode om dit te implementeren met onder andere hulp van de RAG methode en finetuning. Daarnaast gaan we ook nog op zoek naar een geschikt zoekalgoritme om zo snel mogelijk op de juiste data terecht te komen.
 Daardoor kunnen we dan snel zoeken naar waar mogelijks anomalieën zijn in een proces door te vergelijken met andere batches die hetzelfde proces hebben doorlopen.
 Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor onder andere microsoft teams waarbij iemand van de klantenservice kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er mogelijks een fout is geweest in het proces.
 % - Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
@@ -115,7 +131,7 @@ In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk 
 Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
 Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
 Ik hoop ook dat we dit schaalbaar kunnen opstellen en performant kunnen houden waardoor het ook kan gebruikt worden op landelijk of internationaal niveau.
-Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) optimaliseren
+Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) kunnen optimaliseren
 % - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
 % - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
 % BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
