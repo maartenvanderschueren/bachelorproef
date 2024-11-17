@@ -13,9 +13,9 @@
 % 
 \section{Inleiding}%
 \label{sec:inleiding}
-Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen in de industrie, en gaan we aan de slag met traceringsdata van Arcelor Mittal Gent.
+Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen in de industrie, en gaan we aan de slag met traceringsdata van ArcelorMittal Gent.
 
-Binnen Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
+Binnen ArcelorMittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
 Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
 Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
 Dit zorgt ervoor dat iedere stap zijn invloed heeft op de kwaliteit van het eindresultaat.
@@ -38,11 +38,12 @@ Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunte
 De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
 
 \subsection{Grafiek modellering}
-In een grafiekdatabase slaan we gegevens op in de vorm van verices (knopen) en relaties (edges), hierdoor kunnen we complexe verbanden leggen zoals in ons geval de productieprocessen.
+In een grafiekdatabase slaan we gegevens op in de vorm van vertices (nodes) en relaties (edges), hierdoor kunnen we complexe verbanden leggen zoals in ons geval de productieprocessen.
 Cosmos DB ondersteunt ook grafiekmodellering aan met behulp van Gremlin API. Gremlin is gebasseerd op Apache tinkerpop's Gremlin, dit is een krachtig grafiekverwerkingsframework waarbij we grote grafieken kunnen opslaan, modelleren en doorzoeken via gremlin traversal language \autocite{Microsoft2024}.
 Dit gebeurt met een snelheid van milliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten.
 Daarnaast is Gremlin ook schaalbaar en kan het consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie.
-Binnen zo'n grafiek model hebben we Vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die wordt verplaatst van A naar B.
+Binnen zo'n grafiekmodel hebben we vertices die service providers, locaties of resources beschrijven zoals in ons geval bijvoorbeeld een slab, een afdeling of een locatie.
+De edges zullen de events omschrijven zoals bijvoorbeeld de verwerking van een product door een afdeling.
 
 \subsubsection{Verschil transformatie en aggregatie}
 Binnen ons project kunnen de bestaansvormen van producten veranderen. Zo hebben we transformatie, dit is een deel van het proces waarbij de verandering van het product onomkeerbaar is.
@@ -54,23 +55,24 @@ Om onze chatbot te optimaliseren gaan we gebruik maken van RAG.
 Dit zorgt ervoor dat de antwoorden die de chatbot zal geven niet out-dated zijn en een geldige bron bevatten (zoals onze eigen data) \autocite{IBM2023}.
 Binnen een LLM waarbij je RAG gebruikt zal de user een prompt geven, daarna gaat het LLM vragen aan RAG om alle bronnen (data) te geven over het gevraagde onderwerp.
 Zodra hij jouw prompt samen heeft gevoegd met de data die erover beschikbaar is geeft hij een correct antwoord terug.
-In ons geval kunnen we bijvoorbeeld vragen waar de container staal was op een bepaalde datum, en op dat moment vraagt het LLM aan RAG alle informatie over die container waarna hij een geschikt antwoord kan geven.
+In ons geval kunnen we bijvoorbeeld vragen ``We hebben een klacht over batch 123, kan je me vertellen wat er mogelijk fout is gegaan?'', en op dat moment vraagt het LLM aan RAG alle informatie over die batch waarna hij een geschikt antwoord kan geven.
 Deze mehtode wordt ook gebruikt in onder andere ChatGPT en andere LLM's om ervoor te zorgen dat je het model zelf niet herhaaldelijk moet trainen, maar een up-to-date dataset aan koppelt.
 Kort gezegd is RAG een AI framework dat data gebruikt buiten zijn eigen getrainde data om te voorkomen dat je het model moet blijven updaten.
 \subsubsection{RAG vs Finetuning}
 Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en geldige bronnen gebruikt. Dit is voordelig in ons project omdat er dagelijks heel veel staal geproduceerd wordt en dus veel verschillende processen zijn.
 Daarnaast zegt \textcite{IBM2024}, hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken.
 Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs tot overfitting raken waarbij de trainingsdata goed presteerd maar ongeziene data niet zegt \textcite{EASIIO2022}.
-Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit omdat Arcelor Mittal veel vakjargon heeft zoals cokes, slabs,\dots waarmee we ons model kunnen specialiseren en de data die we gebruiken specifiek en up-to-date moet zijn om van elk moment op de hoogte te blijven.
+Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit omdat ArcelorMittal veel vakjargon heeft zoals cokes, slabs,\dots waarmee we ons model kunnen specialiseren en de data die we gebruiken specifiek en up-to-date moet zijn om van elk moment op de hoogte te blijven.
 
 \subsection{EPCIS}
-Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
+Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) standaard, dit zijn de wat, wanneer, waar, waarom en hoe. 
 Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te delen binnen en buiten het bedrijf \autocite{Devins}.
 ``Met behulp van deze waarden kunnen we real-life objecten omzetten in elektronisch opgeslagen informatie, waarna we dit kunnen communiceren met eindgebruikers.`` zegt \textcite{Devins}.
-Door deze normen toe te passen kunnen we de traceerbaarheid van het product per proces garanderen inclusief de gewenste parameters die opgeslagen worden in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
+Door deze normen toe te passen kunnen we de traceerbaarheid van het product per proces garanderen inclusief de sensor report die opgeslagen wordt in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
 \subsubsection{Waarom EPCIS?}
-Huidige Legacy Systemen maken gebruik van ERP, POS, WMS,\dots Vaak lopen deze niet real-time wat nadelig is als we direct iets willen weten over een product en hoge beschikbaarheid verwachten \autocite{Vieweger}.
-Doordat elk bedrijf eenzelfde norm gebruikt kunnen we dit schaalbaar houden en makkelijk uitbereiden.
+Huidige Legacy Systemen maken gebruik van ERP, MES, WMS, DAM, \dots, via EPCIS daarentegen kunnen we onder andere adoptatie eenvoudiger laten verlopen. Denk aan een bedrijf dat kleinere bedrijven heeft opgekocht en een overzicht wil hebben over de verschillende sites heen.
+Als voorbeeld hebben we Tailored Blanks, dit is een entiteit die los staat van ArcelorMittal Gent, maar wel op dezelfde site zit. Hierbij hebben ze hun eigen IT systemen en personeel die los staan van elkaar, maar door de EPCIS standaard kunnen deze eenvoudiger informatie uitwisselen om inzicht te krijgen.
+Ook bij de supply chain geldt dit principe, zo hebben we bijvoorbeeld blanks, lasergelaste vormstukken van bijvoorbeeld voertuigen die kant en klaar zijn voor autobouwers en op een returnable carrier geplaatst worden om te vervoeren \autocite{AMGBlanks}. We willen altijd weten waar die zijn, maar een GPS systeem voor deze carriers zouden te duur worden, maar wat als het ontvangst ons digitaal kan zeggen waar ze zijn op een eenvoudige manier.
 
 
 
@@ -92,11 +94,10 @@ Doordat elk bedrijf eenzelfde norm gebruikt kunnen we dit schaalbaar houden en m
 %   ...'')
 
 % Je mag deze sectie nog verder onderverdelen in subsecties als dit de structuur van de tekst kan verduidelijken.
-\newpage
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
-Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van Arcelor Mittal waar events in opgeslagen staan.
+Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van ArcelorMittal waar events in opgeslagen staan.
 Daarna zetten we dit om naar Cosmos DB (de door Tracked gebruikte database service) en kunnen we via Gremlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
 Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks anders was of fout is gelopen.
 
@@ -128,16 +129,16 @@ Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor o
 \section{Verwacht resultaat, conclusie}%
 \label{sec:verwachte_resultaten}
 In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk is om uit te bereiden naar bijvoorbeeld een planningstool om de meest efficiënte route te zoeken.
-Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
+Door deze chatbot verwachten we dat medewerkers van ArcelorMittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
 Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
 Ik hoop ook dat we dit schaalbaar kunnen opstellen en performant kunnen houden waardoor het ook kan gebruikt worden op landelijk of internationaal niveau.
-Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) kunnen optimaliseren
+Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval ArcelorMittal Gent) kunnen optimaliseren
 \begin{figure}[h!]
     \centering
     \includegraphics{../graphics/flowchart.png}
     \caption{\label{fig:chart}Flowchart}
 \end{figure}
-% - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
+% - Kan een medewerken van ArcelorMittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
 % - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
 % BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
 
