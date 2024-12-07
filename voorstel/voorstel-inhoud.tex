@@ -55,13 +55,13 @@ Dit zorgt ervoor dat de antwoorden die de chatbot zal geven niet out-dated zijn 
 Binnen een LLM waarbij je RAG gebruikt zal de user een prompt geven, daarna gaat het LLM vragen aan RAG om alle bronnen (data) te geven over het gevraagde onderwerp.
 Zodra hij jouw prompt samen heeft gevoegd met de data die erover beschikbaar is geeft hij een correct antwoord terug.
 In ons geval kunnen we bijvoorbeeld vragen waar de container staal was op een bepaalde datum, en op dat moment vraagt het LLM aan RAG alle informatie over die container waarna hij een geschikt antwoord kan geven.
-Deze mehtode wordt ook gebruikt in onder andere ChatGPT en andere LLM's om ervoor te zorgen dat je het model zelf niet herhaaldelijk moet trainen, maar een up-to-date dataset aan koppelt.
+Deze methode wordt ook gebruikt in onder andere ChatGPT en andere LLM's om ervoor te zorgen dat je het model zelf niet herhaaldelijk moet trainen, maar een up-to-date dataset aan koppelt.
 Kort gezegd is RAG een AI framework dat data gebruikt buiten zijn eigen getrainde data om te voorkomen dat je het model moet blijven updaten.
 \subsubsection{RAG vs Finetuning}
 Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en geldige bronnen gebruikt. Dit is voordelig in ons project omdat er dagelijks heel veel staal geproduceerd wordt en dus veel verschillende processen zijn.
-Daarnaast zegt \textcite{IBM2024}, hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken.
-Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs tot overfitting raken waarbij de trainingsdata goed presteerd maar ongeziene data niet zegt \textcite{EASIIO2022}.
-Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit omdat Arcelor Mittal veel vakjargon heeft zoals cokes, slabs,\dots waarmee we ons model kunnen specialiseren en de data die we gebruiken specifiek en up-to-date moet zijn om van elk moment op de hoogte te blijven.
+Daarnaast hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken \autocite{IBM2024}.
+Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs voor overfitting zorgen waarbij de trainingsdata goed presteert, maar ongeziene data niet zegt \textcite{EASIIO2022}.
+Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit komt doordat Arcelor Mittal veel vakjargon hanteert, zoals cokes en slabs. Hierdoor kunnen we ons model specialiseren. Daarnaast moet de data die we gebruiken specifiek en up-to-date zijn, zodat we altijd van elk moment op de hoogte blijven
 
 \subsection{EPCIS}
 Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
@@ -131,7 +131,7 @@ In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk 
 Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
 Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
 Ik hoop ook dat we dit schaalbaar kunnen opstellen en performant kunnen houden waardoor het ook kan gebruikt worden op landelijk of internationaal niveau.
-Door de implementatie van dit systeem hoop ik dat we klanttevredenheid en besparingen binnen een bedrijf (in ons geval Arcelor Mittal Gent) kunnen optimaliseren
+Met de implementatie van dit systeem hopen we de klanttevredenheid en de besparingen binnen een bedrijf, in dit geval Arcelor Mittal Gent, te optimaliseren.
 \begin{figure}[h!]
     \centering
     \includegraphics{../graphics/flowchart.png}
