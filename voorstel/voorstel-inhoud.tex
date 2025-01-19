@@ -13,9 +13,9 @@
 % 
 \section{Inleiding}%
 \label{sec:inleiding}
-Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen in de industrie, en gaan we aan de slag met traceringsdata van Arcelor Mittal Gent.
+Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen in de industrie, en gaan we aan de slag met traceringsdata van ArcelorMittal Gent.
 
-Binnen Arcelor Mittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
+Binnen ArcelorMittal Gent bestaan er veel verschillende processen die verspreid zijn over meerdere afdelingen.
 Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. 
 Tussen elke afdeling bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene afdeling het beginpunt is voor de volgende afdeling.
 Dit zorgt ervoor dat iedere stap zijn invloed heeft op de kwaliteit van het eindresultaat.
@@ -33,16 +33,16 @@ De centrale vraag die hier gesteld wordt is: ``Hoe we efficiënt en snel grafiek
 \label{sec:literatuurstudie}
 
 \subsection{Cosmos DB}%
-Cosmos DB is een NoSQL-database van microsoft.Het biedt een lage latentie, multi-query-api die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
+Cosmos DB is een NoSQL-database van Microsoft. Het biedt een lage latentie, multi-query-API die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
 Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen.
 De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
 
 \subsection{Grafiek modellering}
-In een grafiekdatabase slaan we gegevens op in de vorm van verices (knopen) en relaties (edges), hierdoor kunnen we complexe verbanden leggen zoals in ons geval de productieprocessen.
-Cosmos DB ondersteunt ook grafiekmodellering aan met behulp van Gremlin API. Gremlin is gebasseerd op Apache tinkerpop's Gremlin, dit is een krachtig grafiekverwerkingsframework waarbij we grote grafieken kunnen opslaan, modelleren en doorzoeken via gremlin traversal language \autocite{Microsoft2024}.
+In een grafiekdatabase slaan we gegevens op in de vorm van vertices (knopen) en edges (relaties), hierdoor kunnen we complexe verbanden leggen zoals in ons geval de productieprocessen.
+Cosmos DB ondersteunt ook grafiekmodellering met behulp van Gremlin API. Gremlin is gebasseerd op Apache tinkerpop's Gremlin, dit is een krachtig grafiekverwerkingsframework waarbij we grote grafieken kunnen opslaan, modelleren en doorzoeken via gremlin traversal language \autocite{Microsoft2024}.
 Dit gebeurt met een snelheid van milliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten.
 Daarnaast is Gremlin ook schaalbaar en kan het consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie.
-Binnen zo'n grafiek model hebben we Vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die wordt verplaatst van A naar B.
+Binnen zo'n grafiek model hebben we vertices (of nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld een slab die wordt verplaatst van A naar B.
 
 \subsubsection{Verschil transformatie en aggregatie}
 Binnen ons project kunnen de bestaansvormen van producten veranderen. Zo hebben we transformatie, dit is een deel van het proces waarbij de verandering van het product onomkeerbaar is.
@@ -61,7 +61,7 @@ Kort gezegd is RAG een AI framework dat data gebruikt buiten zijn eigen getraind
 Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en geldige bronnen gebruikt. Dit is voordelig in ons project omdat er dagelijks heel veel staal geproduceerd wordt en dus veel verschillende processen zijn.
 Daarnaast hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door bepaalde vakjargon toe te voegen of het model sneller te maken \autocite{IBM2024}.
 Maar er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel rekenkracht vragen of zelfs voor overfitting zorgen waarbij de trainingsdata goed presteert, maar ongeziene data niet zegt \textcite{EASIIO2022}.
-Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit komt doordat Arcelor Mittal veel vakjargon hanteert, zoals cokes en slabs. Hierdoor kunnen we ons model specialiseren. Daarnaast moet de data die we gebruiken specifiek en up-to-date zijn, zodat we altijd van elk moment op de hoogte blijven
+Een combinatie van deze 2 methodes zou in ons scenario ideaal zijn. Dit komt doordat ArcelorMittal veel vakjargon hanteert, zoals cokes en slabs. Hierdoor kunnen we ons model specialiseren. Daarnaast moet de data die we gebruiken specifiek en up-to-date zijn, zodat we altijd van elk moment op de hoogte blijven
 
 \subsection{EPCIS}
 Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
@@ -96,7 +96,7 @@ Doordat elk bedrijf eenzelfde norm gebruikt kunnen we dit schaalbaar houden en m
 %---------- Methodologie ------------------------------------------------------
 \section{Methodologie}%
 \label{sec:methodologie}
-Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van Arcelor Mittal waar events in opgeslagen staan.
+Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van ArcelorMittal waar events in opgeslagen staan.
 Daarna zetten we dit om naar Cosmos DB (de door Tracked gebruikte database service) en kunnen we via Gremlin API werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken waar, wanneer en hoe een proces gebeurd is.
 Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks anders was of fout is gelopen.
 
@@ -106,7 +106,7 @@ Daardoor kan Tracked in latere fases of andere business cases dezelfde technieke
 Zodra we een duidelijk grafiekmodel hebben waarmee we makkelijk in het verleden kunnen kijken, kunnen we dit trainen met copilot van microsoft.
 Daarna gaan we op zoek naar de beste methode om dit te implementeren met onder andere hulp van de RAG methode en finetuning. Daarnaast gaan we ook nog op zoek naar een geschikt zoekalgoritme om zo snel mogelijk op de juiste data terecht te komen.
 Daardoor kunnen we dan snel zoeken naar waar mogelijks anomalieën zijn in een proces door te vergelijken met andere batches die hetzelfde proces hebben doorlopen.
-Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor onder andere microsoft teams waarbij iemand van de klantenservice kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er mogelijks een fout is geweest in het proces.
+Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor onder andere Microsoft Teams waarbij iemand van de klantenservice kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er mogelijks een fout is geweest in het proces.
 
 
 % - Eerste fase -> begrijpen wat tijdelijke transfereerbare graph techniek is. Werken met CosmosDB heeft grammling API embedded (apache gremlin (https://tinkerpop.apache.org/gremlin.html)). EPCIS Datamodel leren (events van AM transformeren naar Gremlin)
@@ -128,16 +128,16 @@ Als laatste kunnen we dan via copilot makkelijk een implementatie starten voor o
 \section{Verwacht resultaat, conclusie}%
 \label{sec:verwachte_resultaten}
 In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk is om uit te bereiden naar bijvoorbeeld een planningstool om de meest efficiënte route te zoeken.
-Door deze chatbot verwachten we dat medewerkers van Arcelor Mittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
+Door deze chatbot verwachten we dat medewerkers van ArcelorMittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte tijd.
 Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten.
 Er wordt gehoopt dat we een schaalbaar systeem kunnen opstellen en dit performant kunnen houden waardoor het gebruikt kan worden op nationaal en/of internationaal niveau.
-Met de implementatie van dit systeem wordt er gestreefd naar de optimalisatie van klanttevredenheid en besparingen binnen een bedrijf, in dit geval Arcelor Mittal Gent.
+Met de implementatie van dit systeem wordt er gestreefd naar de optimalisatie van klanttevredenheid en besparingen binnen een bedrijf, in dit geval ArcelorMittal Gent.
 \begin{figure}[h!]
     \centering
     \includegraphics{../graphics/flowchart.png}
     \caption{\label{fig:chart}Flowchart}
 \end{figure}
-% - Kan een medewerken van Arcelor Mittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
+% - Kan een medewerken van ArcelorMittal op een eenvoudige manier een antwoord vinden op zijn vraag en wat is de tijdswints & geldbesparing dat ermee gepaard gaat.
 % - Kunnen we op een bepaalde schaalgrootte de grafiek maken en performant houden
 % BusinessUC -> Moet opgenomen worden in verwahte resultaat kost/besparing samenleggen.
 
