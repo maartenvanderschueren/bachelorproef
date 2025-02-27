@@ -11,8 +11,6 @@
 % - If you write your thesis in English (remark: only possible after getting
 %   explicit approval!), remove the option "dutch," or replace with "english".
 
-\usepackage{lipsum} % For blind text, can be removed after adding actual content
-
 %% Pictures to include in the text can be put in the graphics/ folder
 \graphicspath{{../graphics/}}
 
@@ -21,7 +19,7 @@
 %% \usepackage[chapter]{minted}
 %% If you compile with the make_thesis.{bat,sh} script, use the following
 %% import instead:
-\usepackage[chapter,outputdir=../output]{minted}
+\usepackage[chapter]{minted}
 \usemintedstyle{solarized-light}
 
 %% Formatting for minted environments.
@@ -49,22 +47,22 @@
 
 %%---------- Document metadata -------------------------------------------------
 % TODO: Replace this with your own information
-\author{Ernst Aarden}
-\supervisor{Dhr. F. Van Houte}
-\cosupervisor{Mevr. S. Beeckman}
-\title[Optionele ondertitel]%
-    {Titel van de bachelorproef}
+\author{Maarten Van der Schueren}
+\supervisor{Dhr. M. Saelens}
+\cosupervisor{Dhr. B. Peirens}
+\title[]%
+    {Toepassen van een tijdelijke grafiek transformatie op object traceringsdata voor het trainen van een LLM}
 \academicyear{\advance\year by -1 \the\year--\advance\year by 1 \the\year}
 \examperiod{1}
 \degreesought{\IfLanguageName{dutch}{Professionele bachelor in de toegepaste informatica}{Bachelor of applied computer science}}
 \partialthesis{false} %% To display 'in partial fulfilment'
-%\institution{Internshipcompany BVBA.}
+\institution{Tracked N.V.}
 
 %% Add global exceptions to the hyphenation here
 \hyphenation{back-slash}
 
 %% The bibliography (style and settings are  found in hogentthesis.cls)
-\addbibresource{bachproef.bib}            %% Bibliography file
+\addbibresource{bachproef.bib}           %% Bibliography file
 \addbibresource{../voorstel/voorstel.bib} %% Bibliography research proposal
 \defbibheading{bibempty}{}
 
@@ -153,7 +151,12 @@
 Het onderwerp van deze bachelorproef is gebaseerd op een onderzoeksvoorstel dat vooraf werd beoordeeld door de promotor. Dat voorstel is opgenomen in deze bijlage.
 
 %% TODO: 
-%\section*{Samenvatting}
+\section*{Samenvatting}
+    In deze bachelorproef onderzoeken we hoe grafiekmodellering kan bijdragen aan efficiënte klachtenafhandeling binnen bedrijfsprocessen. 
+    Door gebruik te maken van een large language model (LLM) gekoppeld aan een chatbot willen we bedrijven in staat stellen sneller en nauwkeuriger de oorzaken van problemen te achterhalen, waardoor kostbaar handmatig werk wordt verminderd. 
+    Dit door een vraag te stellen aan de chatbot waarbij hij via het grafiekmodel een ongewone gebeurtenis kan ophalen. Het onderzoek richt zich op twee fases: de omzetting van EPCIS-events naar een grafiekmodel in Cosmos DB met behulp van de Gremlin API, en het trainen van een LLM om te analyseren waar, wanneer, wat en hoe gebeurtenissen plaatsvinden. 
+    Dit proces helpt bij het opsporen van anomalieën, met als doel schaalbare en performante oplossingen te bieden voor bedrijfs- en nationale use cases. 
+    Uiteindelijk streven we naar het optimaliseren van klantenervaring en operationele efficiëntie.
 
 % Kopieer en plak hier de samenvatting (abstract) van je onderzoeksvoorstel.
 
