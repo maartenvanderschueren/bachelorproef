@@ -5,7 +5,21 @@
 \chapter{\IfLanguageName{dutch}{Methodologie}{Methodology}}%
 \label{ch:methodologie}
 \section{Dataverwerking}
-In het eerste deel van deze thesis gaan we aan de slag met onze data. Daarbij gaan we op zoek naar een efficiënte manier om de gekregen data om te zetten naar EPCIS waarden die gebruikt kunnen worden in ons grafiekmodel.
+In het eerste deel van deze bachelorproef wordt er een literatuurstudie uitgevoerd over de verschillende technologieën die we gebruiken.
+Hier hebben we de werking en efficiëntie van CosmosDB onderzocht. Daarnaast hebben we ook gekeken naar de werking van Gremlin API en hoe we deze kunnen gebruiken om een grafiekmodel op te zetten.
+Ook is het belangrijk om te weten dat we deze data hebben omgezet naar een jsonLD-bestand die volgens EPCIS normen is opgesteld. Dit garandeerd de duidelijkheid van de data.
+
+\section{Proof of concept}
+\subsection{Opzetten van een grafiekmodel}
+In het tweede deel van deze bachelorproef wordt er een proof of concept opgesteld van het grafiekmodel waarbij we de data van ArcelorMittal Gent zullen gebruiken.
+Zoals eerder vermeld hebben we de data omgezet naar EPCIS waarden in een jsonLD-bestand. Dit bestand wordt ingeladen in CosmosDB via nodejs en Gremlin API.\@
+Daardoor onstaat een grafiekmodel waarin we de data kunnen visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
+Dit grafiekmodel kan gevisualiseerd worden met behulp van Graph Explorer of andere visualisatie tools.
+
+\subsection{Opzetten van een chatbot}
+In het derde deel van deze bachelorproef wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren.
+De input van dit model is een vraag die de gebruiker stelt, deze vraag wordt vertaald naar een Gremlin query die de data in CosmosDB zal bevragen.
+Die kan dan op zijn beurt de relevante knopen en edges vinden, die worden verwerkt en geformatteerd in leesbare tekst.
 %% TODO: In dit hoofstuk geef je een korte toelichting over hoe je te werk bent
 %% gegaan. Verdeel je onderzoek in grote fasen, en licht in elke fase toe wat
 %% de doelstelling was, welke deliverables daar uit gekomen zijn, en welke
