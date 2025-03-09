@@ -17,7 +17,8 @@
 
 \label{sec:grafiekmodellering}
 \section{Grafiekmodellering}
-Grafiekmodellering is een techniek die gebruikt wordt om data te visualiseren en te analyseren. Dit gebeurt door middel van knopen die verbonden zijn met edges, welke de relaties tussen de verschillende knopen weergeven \autocite{neo4j2025}.
+Grafiekmodellering is een techniek die gebruikt wordt om de data te visualiseren en te analyseren. In deze bachelorproef wordt dit gebruikt om de verbanden te leggen tussen de verschillende processen binnen ArcelorMittal Gent.
+Dit gebeurt door middel van knopen die verbonden zijn met edges, welke de relaties tussen de verschillende knopen weergeven \autocite{neo4j2025}.
 Een knoop stelt een entiteit voor, zoals een persoon, een product of een proces. Een edge stelt de relatie tussen de verschillende knopen voor zoals een associatie, transformatie of transactie van een product.
 Dit kan in ons geval een staalplaat zijn die door een kraan verplaatst wordt. Hierbij zijn de kraan en staalplaat de knopen en is de verplaatsing een transactie-relatie tussen deze knopen.
 Elke knoop bevat ook properties die de knoop beschrijven. Dit kan bijvoorbeeld het bouwjaar van een machine zijn of de temperatuur van een product, deze worden opgeslagen als key-value paar om later efficiënt te kunnen ophalen.
@@ -26,6 +27,8 @@ Elke knoop bevat ook properties die de knoop beschrijven. Dit kan bijvoorbeeld h
 Cosmos DB is een NoSQL\-database van Microsoft. Het biedt een lage latentie, multi\-query-API die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
 Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen.
 De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
+Binnen ArcelorMittal wordt gebruik gemaakt van de azure omgeving van Microsoft, waardoor CosmosDB een logische keuze is voor ons project.
+CosmosDB ondersteunt verschillende API's zoals SQL, MongoDB, Cassandra, Gremlin en Table API, waardoor we flexibel kunnen werken met verschillende soorten data.
 
 \subsection{Gremlin API}
 Gremlin is een database query taal die gebruikt wordt om te communiceren met grafiek databases zoals CosmosDB \autocite{Tinkerpop2023}.\@
@@ -33,6 +36,8 @@ De taal bevat verschillende varianten zoals Gremlin-Java, Gremlin-Python en Grem
 In ons geval zullen we Gremlin-Javascript gebruiken om de data van ArcelorMittal Gent in CosmosDB te bevragen. De bevraging is gebasseerd op een RestAPI die de data ophaalt en teruggeeft in json formaat.
 Javascript is hiervoor geschikt omdat Javascript en json een goede combinatie zijn om data te verwerken, daarnaast maken we ook gebruik van nodejs wat met javascript werkt. 
 Als extra kan je met javascript eenvoudig front end en back end combineren, wat mogelijk is voor verdere uitbereiding van deze thesis.
+Hiernaast hebben we ook Neo4J overwogen met cypher als query taal, maar deze heeft zijn eigen ecosysteem en is niet even flexibel en schaalbaar als Gremlin.
+Gremlin daarentegen voorziet dat alle databases die TinkerPop-enabled zijn, kunnen worden gebruikt. Hieronder vallen onder andere Amazon Neptune, CosmosDB, JanusGraph en nog vele andere.\autocite{Tinkerpop2023a}
 
 \subsection{NodeJS}
 NodeJS is een open-source JavaScript runtime-omgeving die de mogelijkheid biedt om JavaScript-code uit te voeren op de server \autocite{NodeJS2022}.
@@ -53,11 +58,10 @@ Sinds 2018 is er een nieuwe feature geïntroduceerd in nodejs genaamd Worker Thr
 Daardoor kunnen we de CPU\-intensieve taken in een aparte thread verwerken en de main thread vrij houden voor andere requests.
 
 \subsection{EPCIS}
-Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. 
+Voor dit onderzoek maken we gebruik van EPCIS (Electronic Product Code Information Services) waarden voor de producten, dit zijn de wat, wanneer, waar, waarom en hoe. 
 Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te delen binnen en buiten het bedrijf \autocite{Devins}.
 ``Met behulp van deze waarden kunnen we real-life objecten omzetten in elektronisch opgeslagen informatie, waarna we dit kunnen communiceren met eindgebruikers.`` zegt \textcite{Devins}.
 Door deze normen toe te passen kunnen we de traceerbaarheid van het product per proces garanderen inclusief de gewenste parameters die opgeslagen worden in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
-\bigbreak
 EPCIS is een GS1-standaard die bedrijven in staat stelt om gebeurtenissen in de toeleveringsketen vast te leggen en te delen. Het biedt een gemeenschappelijk kader voor het vastleggen van de wat, wanneer, waar en waarom van gebeurtenissen die betrekking hebben op fysieke of digitale objecten. Dit helpt bedrijven om een gedetailleerd overzicht te krijgen van de bewegingen en status van producten in de toeleveringsketen, wat essentieel is voor traceerbaarheid en transparantie.
 
 Volgens GS1 \autocite{GS12025} zijn de belangrijkste voordelen van EPCIS:
@@ -80,6 +84,24 @@ Volgens GS1 \autocite{GS12025} zijn de belangrijkste voordelen van EPCIS:
 \end{table}
 
 Door EPCIS te implementeren in ons project kunnen we ervoor zorgen dat alle relevante gegevens over de beweging en status van producten nauwkeurig worden vastgelegd en gedeeld, wat bijdraagt aan een efficiëntere en transparantere toeleveringsketen.
+
+\section{Data preprocessing}
+De data die we gebruiken komt uit een SAP systeem. Deze data bevat een functionele boom structuur van de verschillende levels binnen ArcelorMittal Gent.
+Dit houdt in dat de data in een hiërarchische structuur is opgebouwd, waarbij de verschillende processen met elkaar verbonden zijn.
+Voor het ontcijferen van deze data hebben we verschillende specialisten binnen ArcelorMittal gecontacteerd die ons hebben geholpen met het vertalen van de datacodes.
+Zo zijn we te weten gekomen dat level 1 in de boom de site zelf is en dat level 2 de verschillende afdelingen zijn binnen de site. Zo gaat het telkens dieper tot level 11 waar de verschillende onderdelen van de machines zich bevinden.
+Elke machine heeft een unieke code die we uit een dictionairy kunnen halen die we hebben ontvangen van ArcelorMittal.
+Deze ontcijferingen zijn nodig in een later proces om onze chatbot een correct antwoord te laten geven op de vragen van de gebruiker.
+
+\subsection{JSON tot Graph}
+De data die we ontvangen van ArcelorMittal uit SAP is in json formaat. Deze data stelt ons in staat om door de beschrijving van de keywords de data te ontcijferen en te verwerken in ons grafiekmodel.
+Omdat wij voor Gremlin en EPCIS werken met schema.org hebben wij een json-ld formaat nodig. Dit is een uitbreiding van json die het mogelijk maakt om data te structureren en te annoteren.
+Daarna kunnen we deze json-ld in een folder plaatsen en wordt deze automatisch ingelezen met een nodejs script.
+Deze gaat voor alle types een knoop aanmaken die de juiste properties bevat. Daarna kunnen we ook de edges aanmaken volgens de schema.org structuur.
+
+\subsection{Schema.org}
+Schema.org is een grote verzameling van gestructureerde data die entiteiten (knopen) en relaties kan weergeven \autocite{Douglas2023}.
+Je kan schema.org vergelijken met GS1 maar dan meer generiek. In ons project zullen we de combinatie van schema.org objecten en GS1 objecten gebruiken om de data te structureren.
 
 % \begin{figure}
 %   \centering
