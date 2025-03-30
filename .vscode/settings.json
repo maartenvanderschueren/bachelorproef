@@ -45,6 +45,7 @@
     },
     {
       "args": [
+        "-shell-escape",
         "--input-directory=%OUTDIR%",
         "--output-directory=%OUTDIR%",
         "%DOCFILE%"

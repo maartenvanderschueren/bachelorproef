@@ -10,24 +10,31 @@ In het eerste deel van deze bachelorproef wordt er een literatuurstudie uitgevoe
 Hier hebben we de werking en efficiëntie van CosmosDB onderzocht. Daarnaast hebben we ook gekeken naar de werking van Gremlin API en hoe we deze kunnen gebruiken om een grafiekmodel op te zetten.
 De data die we ontvangen is vrij ingewikkelde data. Dit is namelijk een boom structuur uit SAP die we via een json bestand hebben ontvangen.
 
+\subsection{SAP-data verwerken}
+De SAP data die we ontvangen is een boomstructuur die we ontvangen hebben in een json bestand. Deze data gaan we aan de hand van een JavaScript programma en NodeJS inlezen in CosmosDB.
+De vertaling van de datacodes uit SAP zijn vrij lastig en complex aangezien elke key-value een specifieke code of waarde is. Daarom is het belangrijk dat we deze data goed analyseren en vertalen naar een leesbare vorm voor het grafiekmodel.
+Hiervoor hebben we binnen ArcelorMittal verschillende afdelingen gecontacteerd om de datacodes te kunnen vertalen. Door middel van een excel bestand waarin deze codes en waarden staan in verschillende talen, kunnen we deze keys vertalen naar begrijpbare properties.
+Ook voor de chatbot is het handig dat deze datacodes in verschillende talen vertaald zijn. Zo kunnen we in een latere fase de chatbot ook in verschillende talen laten werken.
 
 \section{Proof of concept}
 \subsection{Opzetten van een grafiekmodel}
 In het tweede deel van deze bachelorproef wordt er een proof of concept opgesteld van het grafiekmodel waarbij we de SAP data van ArcelorMittal Gent zullen gebruiken.
-Zoals eerder vermeld hebben we de van JSON data omgezet naar EPCIS waarden in een jsonLD-bestand. Dit bestand dat opgemaakt is met schema.org en EPCIS waarden wordt ingeladen in CosmosDB via nodejs en Gremlin API.\@
-Daardoor onstaat een grafiekmodel waarin we de data kunnen visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
+Zoals eerder vermeld hebben we de van JSON data omgezet naar EPCIS waarden in een jsonLD-bestand. Dit bestand dat opgemaakt is met schema.org en EPCIS waarden wordt ingeladen in CosmosDB via NodeJS en Gremlin API.\@
+Daardoor ontstaat een grafiekmodel waarin we de data kunnen visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
 Dit grafiekmodel kan gevisualiseerd worden met behulp van Graph Explorer of andere visualisatie tools.
 
-\subsection{SAP-data verwerken}
-De SAP data die we ontvangen is een boomstructuur die we ontvangen hebben in een json bestand. Deze data gaan we aan de hand van een javascript programma en nodejs inlezen in CosmosDB.
-De vertaling van de datacodes uit SAP zijn vrij lastig en complex aangezien elke key-value een specifieke code of waarde is. Daarom is het belangrijk dat we deze data goed analyseren en vertalen naar een leesbare vorm voor het grafiekmodel.
-Hiervoor hebben we binnen ArcelorMittal verschillende afdelingen gecontacteerd om de datacodes te kunnen vertalen. Door middel van een excel bestand waarin deze codes en waarden staan in verschillende talen kunnen we deze keys vertalen naar een leesbare vorm.
-Ook voor de chatbot is het handig dat deze datacodes in verschillende talen vertaald zijn. Zo kunnen we in een latere fase de chatbot ook in verschillende talen laten werken.
 
 \subsection{Opzetten van een chatbot}
 In het derde deel van deze bachelorproef wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren.
 De input van dit model is een vraag die de gebruiker stelt, deze vraag wordt vertaald naar een Gremlin query die de data in CosmosDB zal bevragen.
 Die kan dan op zijn beurt de relevante knopen en edges vinden, die worden verwerkt en geformatteerd in leesbare tekst.
+
+\subsection{Structuur chatbot}
+Voor onze chatbot maken we gebruik van een lokaal Ollama model, dit omdat we zeker willen zijn dat ons model geen data bijhoudt via het internet voor het trainen van zijn eigen model.
+Als voorbeeld hebben we OpenAI die een model heeft dat getraind is op een grote dataset, maar deze data wordt ook gebruikt om het model te verbeteren. Dit is niet de bedoeling voor ons model.
+We gaan met de chatbot een aantal vragen beantwoorden die gerelateerd zijn aan het productieproces van ArcelorMittal Gent. Dit zijn vragen zoals: ``Welke fabrieken staan er in Gent'' of ``Geef alle kranen met een melding op de motor''.
+Dit probleem lossen we op door een iteratief proces binnen onze chatbot. De vraag die gesteld wordt zal een eerste iteratie doen bij onze chatbot en zal een Gremlin query opstellen en teruggeven. 
+Daarna zal deze query uitgevoerd worden in CosmosDB en worden de resultaten teruggegeven aan de chatbot. De chatbot zal dan deze teruggekregen items formatteren naar een natuurlijke zin, waarna hij deze weer terug geeft aan de gebruiker.
 %% TODO: In dit hoofstuk geef je een korte toelichting over hoe je te werk bent
 %% gegaan. Verdeel je onderzoek in grote fasen, en licht in elke fase toe wat
 %% de doelstelling was, welke deliverables daar uit gekomen zijn, en welke
