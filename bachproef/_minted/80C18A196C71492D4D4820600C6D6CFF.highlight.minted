@@ -1,0 +1,38 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{p}{\PYGZob{}}
+\PYG{n+nd}{\PYGZdq{}@context\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{     }\PYG{n+nt}{\PYGZdq{}schema\PYGZdq{}}\PYG{p}{:}\PYG{l+s+s2}{\PYGZdq{}https://schema.org\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{n+nt}{\PYGZdq{}epcis\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}https://ref.gs1.org/epcis/\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{n+nt}{\PYGZdq{}cbv\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}https://ref.gs1.org/cbv/\PYGZdq{}}
+\PYG{p}{\PYGZcb{}}
+\PYG{+w}{     }\PYG{n+nd}{\PYGZdq{}@graph\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{[}
+\PYG{+w}{          }\PYG{p}{\PYGZob{}}
+\PYG{+w}{               }\PYG{n+nd}{\PYGZdq{}@id\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}123\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nd}{\PYGZdq{}@type\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Place\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}name\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Gent\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}label\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Gent\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}schema:containedInPlace\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+m+mi}{321}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}KEY\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}VALUE\PYGZdq{}}
+\PYG{+w}{          }\PYG{p}{\PYGZcb{},}
+\PYG{+w}{          }\PYG{p}{\PYGZob{}}
+\PYG{+w}{               }\PYG{n+nd}{\PYGZdq{}@type\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}epcis:EPCISDocument\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}schemaVersion\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2,0\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}creationDate\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2025\PYGZhy{}03\PYGZhy{}19T17:40:54Z\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{               }\PYG{n+nt}{\PYGZdq{}epcis:EPCISBody\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{n+nt}{\PYGZdq{}epcis:EventList\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}epcis:AssociationEvent\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}eventTime\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2025\PYGZhy{}03\PYGZhy{}19T17:40:54Z\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}eventTimeZoneOffset\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}+01:00\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}parentID\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}[Machine 1]\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}childEPCs\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{[}
+\PYG{+w}{                              }\PYG{l+s+s2}{\PYGZdq{}[Motor 1]\PYGZdq{}}
+\PYG{+w}{                         }\PYG{p}{],}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}action\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}ADD\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}disposition\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}cbv:disp:active\PYGZdq{}}
+\PYG{+w}{                         }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{                    }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{               }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{          }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{     }\PYG{p}{]}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}
