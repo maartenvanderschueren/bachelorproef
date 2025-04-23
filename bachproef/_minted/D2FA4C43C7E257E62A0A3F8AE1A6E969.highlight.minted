@@ -23,9 +23,12 @@
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}epcis:AssociationEvent\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}eventTime\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2025\PYGZhy{}03\PYGZhy{}19T17:40:54Z\PYGZdq{}}\PYG{p}{,}
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}eventTimeZoneOffset\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}+01:00\PYGZdq{}}\PYG{p}{,}
-\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}parentID\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}[Machine 1]\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}parentID\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}Machine 1\PYGZdq{}}\PYG{p}{],}
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}childEPCs\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{p}{[}
-\PYG{+w}{                              }\PYG{l+s+s2}{\PYGZdq{}[Motor 1]\PYGZdq{}}
+\PYG{+w}{                              }\PYG{p}{[}
+\PYG{+w}{                              }\PYG{l+s+s2}{\PYGZdq{}Motor 1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{                              }\PYG{l+s+s2}{\PYGZdq{}Motor 2\PYGZdq{}}
+\PYG{+w}{                              }\PYG{p}{],}
 \PYG{+w}{                         }\PYG{p}{],}
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}action\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}ADD\PYGZdq{}}\PYG{p}{,}
 \PYG{+w}{                         }\PYG{n+nt}{\PYGZdq{}disposition\PYGZdq{}}\PYG{p}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}cbv:disp:active\PYGZdq{}}

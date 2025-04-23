@@ -48,15 +48,18 @@ Deze platen worden doorheen het productieproces getraceerd door middel van een u
 Het is echter niet altijd duidelijk waar in het productieproces een fout is ontstaan.
 In deze bachelorproef wordt er onderzocht hoe we met behulp van een chatbot en grafiekmodellering efficiënt kunnen achterhalen waar in het staalproces een mogelijke fout is ontstaan.
 Het doel van dit onderzoek is om een methode te vinden die het mogelijk maakt snel en accuraat procesfouten of andere cases te identificeren en te analyseren, waardoor een werknemer snel een antwoord kan vinden over een bepaald product.
-Deze bachelorproef is opgesteld op aanvraag van Tracked N.V., een bedrijf dat gespecialiseerd is in het traceren van goederen en processen.
+Deze bachelorproef is opgesteld op aanvraag van Tracked, een bedrijf dat gespecialiseerd is in het traceren van goederen en processen.
 ArcelorMittal Gent vroeg hen om een oplossing te vinden voor het versnellen en automatiseren van procestracering. 
 
 Deze bachelorproef is opgedeeld in verschillende delen.
+
 In het eerste deel wordt er een literatuurstudie uitgevoerd over de verschillende technologieën die gebruikt zullen worden in dit onderzoek.
 Hier hebben we onder andere CosmosDB en Gremlin API ontdekt die ons zullen helpen bij het efficiënt opzetten van een grafiekmodel.
-In het tweede deel wordt er een proof of concept opgesteld van het grafiekmodel waarbij we de data van ArcelorMittal Gent zullen gebruiken.
-Dit gebeurt via een jsonLD-bestand dat we via NodeJS en Gremlin API kunnen inladen in CosmosDB.\@ Daarna kunnen we met visualisatie tools zoals Graph Explorer de data visualiseren.
+In het tweede deel gaan we dieper in op de data en het vertalen van SAP data naar een grafiekmodel.
+Dit gebeurt door de JSON data die we ontvangen hebben van ArcelorMittal Gent om te zetten naar een JSON-LD die GS1 standaarden bevat.
+Daarna wordt deze data ingeladen in CosmosDB via NodeJS en Gremlin API.\@
 In het derde deel wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren. 
 Daardoor kan de chatbot antwoorden geven op vragen over het productieproces.
-In deze bachelorproef gaan we ons focussen op een klein aantal vragen die gesteld kunnen worden omdat dit niet de hoofdzaak is van het onderzoek.
-Deze vragen zullen voornamelijk gaan over het traceren van een product en het opzoeken van fouten in het productieproces.
+
+In deze bachelorproef gaan we ons focussen op een klein aantal vragen die gesteld kunnen worden omdat dit niet scope is van het onderzoek en de gekregen data beperkt is.
+Deze vragen zullen voornamelijk gaan over het traceren van een product en het opzoeken van foutmeldingen in het productieproces.

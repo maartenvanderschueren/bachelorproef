@@ -654,7 +654,6 @@
 %% Subsubsections are preceded by an empty line and do not appear in the table
 %% of contents
 \titlespacing{\subsubsection}{0pt}{\bigskipamount}{0pt}
-
 %% Hyperlinks are blue, except in print mode, when they are all black
 \hypersetup{%
     colorlinks = true,

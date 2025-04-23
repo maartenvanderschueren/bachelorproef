@@ -6,31 +6,32 @@
 \label{ch:inleiding}
 
 In de moderne industriële wereld is efficiëntie cruciaal, vooral binnen ingewikkelde toeleveringsketens zoals die van ArcelorMittal Gent. 
-Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLM). 
+Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling en preventie door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLM). 
 Door traceringsdata om te zetten naar een grafiekmodel en dit te koppelen aan een LLM, willen we bedrijven in staat stellen sneller en nauwkeuriger de oorzaken van problemen te achterhalen. 
 Dit onderzoek, uitgevoerd in samenwerking met Tracked, een specialist rond traceringsdata binnen de Cronos groep, heeft als doel om schaalbare en performante oplossingen te bieden die de efficiëntie en klanttevredenheid optimaliseren.
-Voor dit onderzoek gebruiken we een scope van één week data op een deel van het proces, waarna ze bij slagen van dit proces kunnen uitbereiden naar andere schaalgrootes.
+Voor dit onderzoek gebruiken een installatieboom die alle onderdelen van het productieproces bevat.
 
 \section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}%
 \label{sec:probleemstelling}
 
 % Uit je probleemstelling moet duidelijk zijn dat je onderzoek een meerwaarde heeft voor een concrete doelgroep. De doelgroep moet goed gedefinieerd en afgelijnd zijn. Doelgroepen als ``bedrijven,'' ``KMO's'', systeembeheerders, enz.~zijn nog te vaag. Als je een lijstje kan maken van de personen/organisaties die een meerwaarde zullen vinden in deze bachelorproef (dit is eigenlijk je steekproefkader), dan is dat een indicatie dat de doelgroep goed gedefinieerd is. Dit kan een enkel bedrijf zijn of zelfs één persoon (je co-promotor/opdrachtgever).
 In de complexe toeleveringsketen van ArcelorMittal Gent zijn er veel verschillende processen die verspreid zijn over meerdere afdelingen. 
+Deze processen omvatten onder andere de productie, verpakking en logistiek.
 Elke afdeling heeft specifieke processen en datamodellen, wat het analyseren en onderzoeken van gegevens over afdelingen heen zeer complex en tijdrovend maakt. 
 Dit leidt tot inefficiënties in de klachtenafhandeling of onderhoudsprocessen, en verhoogt de operationele kosten. 
-Er is behoefte aan een schaalbare en performante oplossing die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken van problemen te achterhalen, waardoor kostbaar handmatig werk wordt verminderd.
-Dit is een erkend probleem voor zowel kleine bedrijven zoals bijvoorbeeld kleine ondernemingen of delen van grote bedrijven zoals in ons geval ArcelorMittal, waarbij het staal een grote weg aflegt en niet alleen in Gent blijft.
+Er is behoefte aan een schaalbare en performante oplossing die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken van problemen te achterhalen, waardoor duur en tijdrovend handmatig werk wordt verminderd.
+Dit is een erkend probleem voor zowel kleine bedrijven (zoals bijvoorbeeld kleine ondernemingen) of delen van grote bedrijven (zoals in ons geval ArcelorMittal), waarbij het staal een grote weg aflegt en niet alleen in Gent blijft.
 
 \section{\IfLanguageName{dutch}{Onderzoeksvraag}{Research question}}%
 \label{sec:onderzoeksvraag}
 
 % Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
-Hoe kunnen we efficiënt en snel grafiekmodellering toepassen om een large language model (LLM) te ontwikkelen dat in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten?
+De voornaamste onderzoeksvraag luidt als volgt: `Hoe kunnen we efficiënt en snel grafiekmodellering hanteren om een large language model (LLM) te ontwikkelen dat in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten?`
 Daarnaast zijn belangrijke deelvragen:
 \begin{itemize}
     \item Hoe kunnen we SAP data omzetten naar een grafiekmodel?
-    \item Hoe maken we gebruik van schema.org en EPCIS om de data te structureren?
-    \item Hoe kunnen we een LLM trainen om gebeurtenissen binnen een proces vast te stellen?
+    \item Hoe maken we gebruik van de GS1 standaarden om de data correct te structureren?
+    \item Hoe kunnen we een LLM gebruiken om gebeurtenissen binnen een proces vast te stellen?
     \item Hoe kunnen we een chatbot ontwikkelen die de LLM kan bevragen en een gepast antwoord kan geven op de gestelde vraag?
 \end{itemize}
 \section{\IfLanguageName{dutch}{Onderzoeksdoelstelling}{Research objective}}%
@@ -41,7 +42,7 @@ De doelstelling van deze bachelorproef is om een schaalbare en performante oplos
 Dit wordt bereikt door het toepassen van grafiekmodellering op traceringsdata en het trainen van een large language model (LLM). 
 Het uiteindelijke doel is om de operationele efficiëntie te verbeteren en de klanttevredenheid te optimaliseren door een efficiënte klachtenafhandeling mogelijk te maken.
 
-Binnen de doelstelling van mijn bachelorproef gebruiken we een scope van ongeveer een week data van de staalfabriek. 
+Binnen de doelstelling van deze bachelorproef gebruiken zoals eerder vermeld de boomstructuur van ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. 
 Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de motor de afgelopen 24 uur.`` en dat de chatbot dit kan beantwoorden.
 \section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}%
 \label{sec:opzet-bachelorproef}
@@ -50,14 +51,16 @@ Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de
 % geven van de opbouw van de rest van de tekst. Deze sectie bevat al een aanzet
 % die je kan aanvullen/aanpassen in functie van je eigen tekst.
 
-De rest van deze bachelorproef is als volgt opgebouwd:
+De bachelorproef is als volgt opgebouwd:
 
-In Hoofdstuk~\ref{ch:stand-van-zaken} wordt een overzicht gegeven over welke technologieën we gebruiken, zoals CosmosDB, Gremlin API en schema.org.
+Eerst en vooral in hoofdstuk~\ref{ch:stand-van-zaken} wordt een overzicht gegeven over welke technologieën we gebruiken, zoals CosmosDB, Gremlin API en schema.org.
 Daarnaast wordt er ook een overzicht gegeven van de literatuur die relevant is voor dit onderzoek.
 
-In Hoofdstuk~\ref{ch:methodologie} wordt de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
+Als laatste wordt er in hoofdstuk~\ref{ch:methodologie} de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
 Zo leggen we uit hoe we de SAP data omzetten naar een grafiekmodel, hoe we een LLM trainen en hoe we een chatbot ontwikkelen die de LLM kan bevragen.
 
 % TODO: Vul hier aan voor je eigen hoofstukken, één of twee zinnen per hoofdstuk
 
-In Hoofdstuk~\ref{ch:conclusie}, tenslotte, wordt de conclusie gegeven en een antwoord geformuleerd op de onderzoeksvragen. Daarnaast bespreken we een aantal mogelijke uitbereidingen van dit onderzoek.
+In Hoofdstuk~\ref{ch:conclusie}, tot slot, er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast bespreken we een aantal mogelijke uitbereidingen van dit onderzoek.
+
+Belangrijk om te vermelden is dat alle data en code gebruikt in deze thesis fictief is en enkel dient ter illustratie van de werking van de verschillende technologieën.
