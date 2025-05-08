@@ -1,0 +1,18 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYGZob{}
+    Document 1: \PYGZdq{}Geef alle machines in Gent\PYGZdq{}
+    Document 2: \PYGZdq{}Toon alle motoren in Antwerpen\PYGZdq{}
+
+    tokens: [\PYGZsq{}Geef\PYGZsq{}, \PYGZsq{}alle\PYGZsq{}, \PYGZsq{}machines\PYGZsq{}, \PYGZsq{}in\PYGZsq{}, \PYGZsq{}Gent\PYGZsq{}, \PYGZsq{}Toon\PYGZsq{}, \PYGZsq{}motoren\PYGZsq{}, \PYGZsq{}Antwerpen\PYGZsq{}]
+     inverted index: \PYGZob{}
+          \PYGZsq{}Geef\PYGZsq{}: [1],
+          \PYGZsq{}alle\PYGZsq{}: [1, 2],
+          \PYGZsq{}machines\PYGZsq{}: [1],
+          \PYGZsq{}in\PYGZsq{}: [1, 2],
+          \PYGZsq{}Gent\PYGZsq{}: [1],
+          \PYGZsq{}Toon\PYGZsq{}: [2],
+          \PYGZsq{}motoren\PYGZsq{}: [2],
+          \PYGZsq{}Antwerpen\PYGZsq{}: [2]
+     \PYGZcb{}
+\PYGZcb{}
+\end{MintedVerbatim}

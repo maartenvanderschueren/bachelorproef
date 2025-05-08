@@ -43,23 +43,28 @@
 %%---------- Samenvatting -----------------------------------------------------
 % De samenvatting in de hoofdtaal van het document
 \chapter*{\IfLanguageName{dutch}{Samenvatting}{Abstract}}
-In de fabrieksomgeving van ArcelorMittal Gent worden er dagelijks verschillende staalplaten geproduceerd.
-Deze platen worden doorheen het productieproces getraceerd door middel van een uniek nummer.
-Het is echter niet altijd duidelijk waar in het productieproces een fout is ontstaan.
-In deze bachelorproef wordt er onderzocht hoe we met behulp van een chatbot en grafiekmodellering efficiënt kunnen achterhalen waar in het staalproces een mogelijke fout is ontstaan.
-Het doel van dit onderzoek is om een methode te vinden die het mogelijk maakt snel en accuraat procesfouten of andere cases te identificeren en te analyseren, waardoor een werknemer snel een antwoord kan vinden over een bepaald product.
+In de fabrieksomgeving van ArcelorMittal Gent worden er dagelijks verschillende staalrollen geproduceerd.
+Deze rollen worden doorheen het productieproces getraceerd door middel van een uniek nummer.
+Het is echter niet altijd duidelijk waar in het productieproces een fout is ontstaan of welke machines invloed hebben op deze fout.
+Dit kan leiden tot een inefficiënte zoektocht naar de oorzaak van de fout, wat tijd en middelen kost.
+Daarnaast is het ook niet altijd duidelijk welke machines of processen invloed hebben op de productie.
+
+In deze bachelorproef wordt er onderzocht hoe we met behulp van een chatbot en grafiekmodellering efficiënt kunnen achterhalen waar mogelijke fouten zijn en welke delen van de productie beïnvloed kunnen zijn.
+Het doel van dit onderzoek is om een methode te vinden die het mogelijk maakt snel en accuraat procesfouten of andere cases te identificeren en te analyseren, waardoor een werknemer snel informatie kan vinden over een bepaald product of gerelateerde middelen (zoals een kraan of machine).
 Deze bachelorproef is opgesteld op aanvraag van Tracked, een bedrijf dat gespecialiseerd is in het traceren van goederen en processen.
-ArcelorMittal Gent vroeg hen om een oplossing te vinden voor het versnellen en automatiseren van procestracering. 
+ArcelorMittal Gent vroeg hen om een oplossing te ontwikkelen om de procestracering te versnellen en te automatiseren, met als doel het zoeken naar informatie via verschillende afdelingen te beperken.
 
 Deze bachelorproef is opgedeeld in verschillende delen.
 
 In het eerste deel wordt er een literatuurstudie uitgevoerd over de verschillende technologieën die gebruikt zullen worden in dit onderzoek.
 Hier hebben we onder andere CosmosDB en Gremlin API ontdekt die ons zullen helpen bij het efficiënt opzetten van een grafiekmodel.
-In het tweede deel gaan we dieper in op de data en het vertalen van SAP data naar een grafiekmodel.
-Dit gebeurt door de JSON data die we ontvangen hebben van ArcelorMittal Gent om te zetten naar een JSON-LD die GS1 standaarden bevat.
-Daarna wordt deze data ingeladen in CosmosDB via NodeJS en Gremlin API.\@
-In het derde deel wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren. 
-Daardoor kan de chatbot antwoorden geven op vragen over het productieproces.
+In het tweede deel gaan we dieper in op de data en het vertalen van SAP data naar een grafiekmodel in een grafiekdatabase.
+Dit doen we door gebruik te maken van een JSONLD-bestand dat opgemaakt is met schema.org, GS1 en EPCIS-events.
+Dit bestand wordt ingeladen in CosmosDB via NodeJS en Gremlin API, waardoor er een grafiekmodel ontstaat waarin we de data kunnen visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
+In het derde deel wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren.
+Hiervoor maken we gebruik van een iteratief proces waarbij de chatbot de vraag van de gebruiker omzet naar een Gremlin query die de data in CosmosDB bevragt.
+De chatbot kan de relevante knopen en relaties vinden, die worden verwerkt en geformatteerd in leesbare tekst.
+Daardoor kan de chatbot antwoorden geven op een vraag die de gebruiker stelt, zoals: ``Welke fabrieken staan er in Gent'' of ``Geef alle kranen met een melding op de motor''.
 
-In deze bachelorproef gaan we ons focussen op een klein aantal vragen die gesteld kunnen worden omdat dit niet scope is van het onderzoek en de gekregen data beperkt is.
+In deze bachelorproef gaan we ons focussen op een klein aantal vragen die gesteld kunnen worden, dit omdat dit niet het hoofddoel is van deze bachelorproef.
 Deze vragen zullen voornamelijk gaan over het traceren van een product en het opzoeken van foutmeldingen in het productieproces.

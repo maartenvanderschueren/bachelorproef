@@ -1,3 +1,0 @@
-\begin{MintedVerbatim}[commandchars=\\\{\}]
-\PYG{k}{g}\PYG{p}{.}\PYG{n}{V}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{n}{hasLabel}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}Machine\PYGZsq{}}\PYG{p}{)}\PYG{p}{.}\PYG{n}{has}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}label\PYGZsq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}Machine 1\PYGZsq{}}\PYG{p}{)}\PYG{p}{.}\PYG{n}{outE}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}IS\PYGZus{}ASSOCIATED\PYGZsq{}}\PYG{p}{)}\PYG{p}{.}\PYG{n}{inV}\PYG{p}{(}\PYG{p}{)}\PYG{p}{.}\PYG{k}{values}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}label\PYGZsq{}}\PYG{p}{)}
-\end{MintedVerbatim}

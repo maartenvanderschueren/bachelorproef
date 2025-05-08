@@ -15,20 +15,28 @@
 
 % Let er ook op: het \texttt{cite}-commando voor de punt, dus binnen de zin. Je verwijst meteen naar een bron in de eerste zin die erop gebaseerd is, dus niet pas op het einde van een paragraaf.
 \section{Technische Specificaties}
-In dit hoofdstuk bespreken we de technische specificaties van de verschillende technologieën die we gebruiken in deze bachelorproef.
+In dit eerset hoofdstuk bespreken we de technische specificaties van de verschillende technologieën die we gebruiken in deze bachelorproef.
 Hierbij gaan we dieper in op het gebruik van CosmosDB, NodeJS, Gremlin API en de verschillende modellen die we gebruiken om de data te structureren en te analyseren.
 Ook bespreken we andere technische mogelijkheden die we getest hebben, maar niet gebruikt door bepaalde redenen. 
 
 \subsection{Grafiekmodellering}
 Grafiekmodellering is een techniek die gebruikt wordt om de data te visualiseren en te analyseren. In deze bachelorproef wordt dit gebruikt om de verbanden te leggen tussen de verschillende processen binnen ArcelorMittal Gent.
-Dit gebeurt door middel van knopen die verbonden zijn met andere knopen met een relatie.~\autocite{neo4j20252}.
+Dit gebeurt door middel van één of meerdere knopen die verbonden zijn met andere knopen met een relatie.~\autocite{neo4j20252}.
 Een knoop stelt een entiteit voor, zoals een persoon, een product of een proces. Een verbinding stelt de relatie tussen de verschillende knopen voor zoals een associatie, transformatie of transactie van een product.
 Dit kan in ons geval een staalplaat zijn die door een kraan verplaatst wordt. Hierbij zijn de kraan en staalplaat de knopen en is de verplaatsing een transactie-relatie tussen deze knopen.
-Elke knoop bevat ook properties die de knoop beschrijven. Dit kan bijvoorbeeld het bouwjaar van een machine zijn of de temperatuur van een product, deze worden opgeslagen als sleutel-waarde paar om later efficiënt te kunnen ophalen.
+Elke knoop bevat ook properties die de knoop beschrijven. Dit kan bijvoorbeeld het bouwjaar, laatste onderhoud of zelfs sensordata zoals temperatuur van een machine zijn.
+Deze data wordt opgeslagen als sleutel-waarde paar om dit later efficiënt te kunnen ophalen, door in de query te vragen naar de sleutelwaarde.
 in figuur~\ref{fig:graphmodel} is een voorbeeld te zien van een grafiekmodel met fictieve data dat we hebben opgezet in CosmosDB.\@
 
+\begin{figure}[H]
+     \centering
+     \includegraphics[width=0.8\textwidth]{./img/MMLU.png}
+     \caption[Voorbeeld Grafiekmodel.]{\label{fig:MMLU}Voorbeeld van kleinschalig grafiekmodel, gemaakt met mock data.}
+\end{figure}
+
 \subsection{CosmosDB}
-Cosmos DB is een NoSQL-database van het Microsoft Azure ecosysteem. Het biedt een lage latentie, multi-query-API die eenvoudig grote hoeveelheden data kan verwerken en heeft een grote beschikbaarheid, zegt~\textcite{Put2020}, wat zeer belangrijk is in ons project.
+Cosmos DB is een NoSQL-database van het Microsoft Azure ecosysteem. Het biedt een lage latentie, is beschikbaar voor verschillende API's en kan een grote hoeveelheden data kan verwerken en een grote beschikbaarheid heeft, zegt~\textcite{CosmosDB2024}, wat zeer belangrijk is in ons project.
+Een multi-query-API betekent 
 Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen.
 De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in onze database.
 Binnen ArcelorMittal wordt gebruik gemaakt van onder andere de Azure omgeving van Microsoft, waardoor CosmosDB een logische keuze is voor ons project.
@@ -67,13 +75,26 @@ Als extra kan er met JavaScript eenvoudig een front end gekoppeld worden, wat ha
 Hiernaast hebben we ook Neo4J overwogen met cypher als query taal, maar deze heeft zijn eigen ecosysteem en is niet even flexibel en schaalbaar als Gremlin API.\@
 Gremlin daarentegen voorziet dat alle databases die TinkerPop-enabled zijn, kunnen worden gebruikt. Dit zijn databases die ondersteund worden door het Apache TinkerPop framework.
 Hieronder vallen onder andere Amazon Neptune, CosmosDB, JanusGraph en nog vele andere \autocite{Tinkerpop2023a}.
-Via de Gremlin API kunnen we verschillende vragen stellen aan de database en de data ophalen die we nodig hebben. Zo kan je opvragen welke knopen er zijn, hoeveel uitgaande relaties er zijn, \dots.
-In codefragment~\ref{fig:gremlin} is een voorbeeld te zien van een Gremlin query die de knopen verbonden met Machine 1 ophaalt.
+Via de Gremlin API kunnen we verschillende vragen stellen aan de database en de data ophalen die we nodig hebben. 
+Zo kan je opvragen welke knopen er zijn, hoeveel uitgaande relaties er zijn, \dots.
+Een belangrijke notitie is dat Gremlin case-sensitive is, wat betekent dat we de juiste hoofdletters moeten gebruiken in de queries.
+Dit kan mogelijk problemen geven bij het ophalen van de data. Hiervoor hebben we alle values in de database omgezet naar grote letters, zodat we geen problemen krijgen met het ophalen van de data.
+Daarnaast hebben we bepaalde sleutelwaarden die in CosmosDB ook de juiste hoofdletters moet hebben, hiervoor hebben we een kleine dictionairy meegegeven aan de chatbot die de juiste hoofdletters bevat.
+Dit doen we door deze sleutelwoorden op te halen voor we de query uitvoeren en mee te geven bij het controleren van de query.
+Door deze wijze toe te passen kunnen we de data ophalen die we nodig hebben zonder dat we problemen krijgen met de hoofdletters.
+Voor de values hebben we alles in kleine letters gezet, wat het makkelijker maakt om deze controle uit te voeren.
+In codefragment~\ref{fig:gremlin} is een voorbeeld te zien van een Gremlin query die de knopen verbonden met machine 1 ophaalt.
+Zoals te zien in de query, hebben we een query voor het opschonen ervan en een query na het opschonen. Daarin zien we dat alles wat in kleine letters moet staan ook in kleine letters staat.
+Dit is iets waar we tijdens de test fase tegenaan zijn gelopen, maar door code gewijs aan te passen dat de hoofdletters pas na de g-functie komen was dit probleem snel opgelost.
 Hierbij maken we gebruik van de outE functie die de uitgaande relaties ophaalt van de knoop, en de inV functie die de inkomende knopen ophaalt.
 
 \begin{listing}
      \begin{minted}{SQL}
-          g.V().hasLabel('Machine').has('label', 'Machine 1').outE('IS_ASSOCIATED').inV().values('label')
+          -- Query voor het opschonen
+          g.V().HAS('label', 'MACHINE 1').OUTE('IS_ASSOCIATED').INV()
+
+          -- Query na het opschonen
+          g.V().has('label', 'machine 1').outE('is_associated').inV()
      \end{minted}
      \caption[Voorbeeld Gremlin query]{\label{fig:gremlin}Voorbeeld van een Gremlin query die de knopen ophaalt uit de database.}
 \end{listing}
@@ -151,17 +172,20 @@ Een voorbeeld hiervan staat in tabel~\ref{tab:csv}.
 
 Voor de natuurlijke taal is dit model minder geschikt, het genereert vaak een technisch antwoord dat niet altijd even duidelijk is.
 Het model bestaat in verschillende groottes, van 7B tot 70B parameters, afhankelijk van de use-case.
-Wij maken gebruik van de 7B parameters versie omdat deze het snelste is en ook de beste resultaten geeft voor onze Gremlin queries.
+Daarnaast heeft het model ook verschillende versies zoals quantized en instruct versies~\autocite{HuggingFaceCodellama}.
+De quantized versie is een versie die geoptimaliseerd is voor snelheid en geheugen, maar met een iets lagere nauwkeurigheid.
+De instruct versie is een versie die geoptimaliseerd is voor opvolgen van instructies en codeer ondersteuning.
+Wij maken gebruik van de 7B parameters-instruct versie die quantized is omdat deze instructies kan opvolgen, maar ook lichtgewicht is en voor weinig performantie problemen zal zorgen.
 Dit model wordt ook alleen gebruikt voor het genereren van de Gremlin queries, daarna zal de gekregen data geanalyseerd worden door Phi-4 wat een sneller en lichter model is.
 
 \begin{table}[H]
-     \begin{tabular}{lp{0.6\textwidth}}
+     \begin{tabular}{lp{0.5\textwidth}}
          \toprule
          \textbf{Vraag} & \textbf{Gremlin query} \\
          \toprule
-         Wat is de temperatuur van de staalplaat? & \texttt{g.V().hasLabel('Staalplaat').values('temperatuur')} \\
+         Geef informatie over Gent & \texttt{g.V().has('name', 'Gent')} \\
          \midrule
-         Wat is de temperatuur van de staalplaat in oven 1? & \texttt{g.V().hasLabel('Staalplaat').has('name', containing('oven 1')).values(containing('temperatuur'))} \\
+         Geef alle elementen op level 0 & \texttt{g.V().has('level', '0')} \\
          \bottomrule
      \end{tabular}
      \caption[Voorbeeld CSV-bestand.]{\label{tab:csv}Voorbeeld van een CSV-bestand dat we gebruiken om het model te trainen.}
@@ -183,13 +207,6 @@ Door de meertaligheid van dit model, waarbij het op 40 verschillende talen is ge
 De beste prestaties zullen overigens in het Engels zijn, maar de resultaten in het Nederlands zijn ook zeer goed.
 Dit zorgt voor een snelle, toegankelijke en krachtige aanpassing van het model zonder dat we zelf een model moeten trainen.
 Daarom zullen we dit model gebruiken om de gekregen data uit het JSON antwoord te analyseren en een natuurlijk antwoord terug te geven.
-
-\begin{figure}[H]
-     \centering
-     \includegraphics[width=0.8\textwidth]{./img/MMLU.png}
-     \caption[Voorbeeld Grafiekmodel.]{\label{fig:MMLU}Voorbeeld van kleinschalig grafiekmodel, gemaakt met mock data.}
-\end{figure}
-% TODO
 
 \section{Data preprocessing}
 De data die we gebruiken komt uit een SAP systeem. Deze data bevat een functionele boom structuur van de verschillende levels binnen ArcelorMittal Gent.
@@ -403,11 +420,62 @@ Hierdoor kan de chatbot beter begrijpen wat er van hem verwacht wordt en hoe hij
 Dit is een low-level oplossing die snel en flexibel bruikbaar is.
 
 Hierbij hebben we een simpel tekstbestand met context aangemaakt waarbij de nodige informatie meegegeven wordt, zoals zijn functie en wat belangrijk is of niet.
-Daarnaast hebben we ook een aantal voorbeeldvragen en antwoorden toegevoegd die de chatbot kan gebruiken om te leren.
+Daarnaast hebben we ook een aantal voorbeeldvragen en antwoorden toegevoegd via een CSV bestand, die geïndexeerd worden in een elasticsearch-cluster, die we bespreken in~\ref{sec:elasticsearch}, dat draait binnen een docker container.
 Dit is een belangrijke stap omdat de chatbot hierdoor beter kan begrijpen wat er van hem verwacht wordt en hoe hij de vragen moet beantwoorden.
 Daarnaast is het belangrijk dat we als context meegeven dat hij geen tekst of codeblokken mag genereren maar enkel en alleen de query mag teruggeven.
-Hiervoor hebben we ook een veiligheidsmechanisme ingebouwd dat ervoor zorgt dat query geen codeblok is zoals in markdown door de backtics te verwijderen.
+Hiervoor hebben we ook een veiligheidsmechanisme gecodeerd dat ervoor zorgt dat query geen codeblok is zoals in markdown door de backtics te verwijderen.
 Dit is belangrijk omdat we deze query direct implementeren in de database, wat betekent dat als er overige tekst of karakters in staan, dat het genereren zal mislukken door syntax fouten.
-Indien een query succesvol is uitgevoerd, wordt deze query ook opgeslagen in de csv, zo ontstaat er een soort notitieboek voor de chatbot waar hij uit kan leren.
-Het is belangrijk dat hij de JSON met items kan omzetten naar natuurlijke taal en begrijpt wat er wel of niet meegegeven mag worden.
+Indien een query succesvol uitgevoerd is, wordt deze query ook opgeslagen in de csv en toegevoegd aan de elasticsearch-cluster.
+Het is ook belangrijk dat hij de JSON resultset met items kan omzetten naar natuurlijke taal en begrijpt wat er wel of niet meegegeven mag worden.
 Als voorbeeld hebben we dat er in het antwoord soms database performantiemetingen meegegeven worden en deze zijn niet relevant voor de gebruiker.
+
+\subsection{Elasticsearch}\label{sec:elasticsearch}
+Elasticsearch is een open-source, zoek en analyse-motor die gebruikt wordt voor het doorzoeken en analyseren van grote hoeveelheden data~\autocite{Elastic2025}.
+Het is een gedistribueerde, RESTful zoekmachine die is gebouwd op Apache Lucene en biedt een krachtige en flexibele manier om gegevens te indexeren en doorzoeken.
+Doordat Elasticsearch is gebouwd op een gedistribueerde architectuur, kan het grote hoeveelheden gegevens verwerken en snel resultaten teruggeven.
+Met gedistribueerde architectuur bedoelen we dat de data en rekenkracht verdeeld kan worden over verschillende rekenbronnen, wat zorgt voor een betere schaalbaarheid en prestaties.
+We gebruiken Elasticsearch om de csv-data omtrent de gremlin queries, die we verzameld hebben, op te slaan in een geïndexeerd cluster en snel te doorzoeken.
+Elasticsearch indexeert en maakt tokens van de data, dat is een groot voordeel voor het stellen van de vraag, zeiden \textcite{Kathare2021}.
+Door de tokenizatie kan de chatbot ook vragen beantwoorden die niet letterlijk in de data staan, maar wel gerelateerd zijn aan de data.
+Later in dit hoofdstuk gaan we dieper in op de tokenizatie en hoe dit werkt.
+Naast tokenizatie, maakt elasticsearch ook gebruik van een inverted index, dit is een datastructuur die het mogelijk maakt om snel te zoeken naar documenten die bepaalde termen bevatten~\autocite{Brimley2023}.
+Door de tokenizatie en inverted index te combineren, kunnen we snel en correct een query genereren die de juiste resultaten teruggeeft.
+
+\subsubsection{Tokenizatie}
+Tokenizatie is een proces waarbij een tekst in kleine delen wordt gesplitst, deze delen komen terecht in een token stream die gebruikt wordt om te zoeken naar een bijpassend antwoord~\autocite{Kathare2021}.
+Zo een token stream is de array met de verschillende woorden die in de vraag staan, dit wordt op zowel de vraag als de cluster toegepast.
+Door deze token streams van vraag en cluster te vergelijken kunnen we met een threshold de relevantie bepalen om een juiste match te vinden.
+
+\subsubsection{Inverted index}
+De inverted index is een lijst van alle tokens die in een vraag voorkomen, deze tokens krijgen in de inverted index één of meer ID's toegewezen.
+Deze ID's zijn unieke id's die verwijzen naar de vraag die de token bevat. Hierdoor kunnen we enorm snel zoeken naar de juiste vraag en deze teruggeven aan de gebruiker.
+De score van hoe relevant de vraag is wordt berekend op basis van TF (term frequency) en IDF (inverse document frequency).
+Dit houdt in dat hoe vaker en hoe zeldzamer een token in een vraag is, hoe hoger de score zal zijn en dus hoe relevanter de vraag is.
+In fragment~\ref{fig:invertedIndex} is een voorbeeld te zien van een zin omgezet naar inverted index. 
+Daar zal voor de vraag Toon alle machines in Gent gekozen worden voor de query die bij Geef alle machines in Gent hoort.
+Dit omdat de frequency van de token ``machines en Gent'' in de vraag hoger is dan de andere tokens.
+
+\begin{listing}[H]
+     \begin{minted}{text}
+          {
+              Document 1: "Geef alle machines in Gent"
+              Document 2: "Toon alle motoren in Antwerpen"
+
+              tokens: ['Geef', 'alle', 'machines', 'in', 'Gent', 'Toon', 'motoren', 'Antwerpen']
+               inverted index: {
+                    'Geef': [1],
+                    'alle': [1, 2],
+                    'machines': [1],
+                    'in': [1, 2],
+                    'Gent': [1],
+                    'Toon': [2],
+                    'motoren': [2],
+                    'Antwerpen': [2]
+               }
+          }
+     \end{minted}
+     \caption[Voorbeeld inverted index]{\label{fig:invertedIndex}Voorbeeld van een inverted index.}
+\end{listing}
+
+\subsection{Docker}
+
