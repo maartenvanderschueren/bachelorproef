@@ -6,10 +6,14 @@
 \label{ch:inleiding}
 
 In de moderne industriële wereld is efficiëntie cruciaal, vooral binnen ingewikkelde toeleveringsketens zoals die van ArcelorMittal Gent. 
-Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling en preventie door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLM). 
+Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling en preventie van fouten, door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLMs). 
 Door traceringsdata om te zetten naar een grafiekmodel en dit te koppelen aan een LLM, willen we bedrijven in staat stellen sneller en nauwkeuriger de oorzaken van problemen te achterhalen. 
-Dit onderzoek, uitgevoerd in samenwerking met Tracked, een specialist rond traceringsdata binnen de Cronos groep, heeft als doel om schaalbare en performante oplossingen te bieden die de efficiëntie en klanttevredenheid optimaliseren.
-Voor dit onderzoek gebruiken een installatieboom die alle onderdelen van het productieproces bevat.
+Dit onderzoek, uitgevoerd in samenwerking met Tracked, een bedrijf van de Cronos groep gespecialiseerd in traceringsdata, heeft als doel om schaalbare en performante oplossingen te bieden die de efficiëntie en klanttevredenheid optimaliseren.
+Voor dit onderzoek maken we gebruik van een installatieboom die alle onderdelen van het productieproces bevat.
+Let op dat de data die we gebruiken omtrent dit proces louter fictief is en enkel dient ter illustratie van de werking van de verschillende technologieën.
+In~\ref{sec:dataopstelling} wordt er meer uitleg gegeven over de data die we gebruiken aangezien we niet de originele data hebben gebruikt om dit onderzoek te volbrengen.
+De reden hiervoor is dat de originele data vertrouwelijk is en niet openbaar gemaakt kan worden. 
+Daarnaast is er ook gevraagd om een minim aantal aan code weer te geven in de thesis, dit om mogelijke datalekken zo veel mogelijk te voorkomen.
 
 \section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}%
 \label{sec:probleemstelling}
@@ -26,7 +30,7 @@ Dit is een erkend probleem voor zowel kleine bedrijven (zoals bijvoorbeeld klein
 \label{sec:onderzoeksvraag}
 
 % Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
-De voornaamste onderzoeksvraag luidt als volgt: `Hoe kunnen we efficiënt en snel grafiekmodellering hanteren om een large language model (LLM) te ontwikkelen dat in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten?`
+De voornaamste onderzoeksvraag luidt als volgt: `Hoe kunnen we efficiënt en snel grafiekmodellering hanteren en met behulp van een large language model (LLM) een chatbot ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten\texttt{?}`
 Daarnaast zijn belangrijke deelvragen:
 \begin{itemize}
     \item Hoe kunnen we SAP data omzetten naar een grafiekmodel?
@@ -42,25 +46,23 @@ De doelstelling van deze bachelorproef is om een schaalbare en performante oplos
 Dit wordt bereikt door het toepassen van grafiekmodellering op traceringsdata en het trainen van een large language model (LLM). 
 Het uiteindelijke doel is om de operationele efficiëntie te verbeteren en de klanttevredenheid te optimaliseren door een efficiënte klachtenafhandeling mogelijk te maken.
 
-Binnen de doelstelling van deze bachelorproef gebruiken zoals eerder vermeld de boomstructuur van ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. 
-Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de motor de afgelopen 24 uur.`` en dat de chatbot dit kan beantwoorden.
+Binnen de doelstelling van deze bachelorproef wordt er gebruik gemaakt fictieve data gebasseerd op de boomstructuur van ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. 
+Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de motor de afgelopen 24 uur\texttt{.}'' en dat de chatbot dit kan beantwoorden.
 \section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}%
 \label{sec:opzet-bachelorproef}
 
 % Het is gebruikelijk aan het einde van de inleiding een overzicht te
 % geven van de opbouw van de rest van de tekst. Deze sectie bevat al een aanzet
 % die je kan aanvullen/aanpassen in functie van je eigen tekst.
-
 De bachelorproef is als volgt opgebouwd:
 
 Eerst en vooral in hoofdstuk~\ref{ch:stand-van-zaken} wordt een overzicht gegeven over welke technologieën we gebruiken, zoals CosmosDB, Gremlin API en schema.org.
 Daarnaast wordt er ook een overzicht gegeven van de literatuur die relevant is voor dit onderzoek.
 
 Als laatste wordt er in hoofdstuk~\ref{ch:methodologie} de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
-Zo leggen we uit hoe we de SAP data omzetten naar een grafiekmodel, hoe we een LLM trainen en hoe we een chatbot ontwikkelen die de LLM kan bevragen.
+Zo leggen we uit hoe we de SAP data omzetten naar een grafiekmodel, hoe we gebruik maken van een LLM en deze implementeren via een REST API.\@
+Dit alles wordt opgebouwd in docker om flexibel te zijn met de onderliggende infrastructuur.
 
 % TODO: Vul hier aan voor je eigen hoofstukken, één of twee zinnen per hoofdstuk
 
-In Hoofdstuk~\ref{ch:conclusie}, tot slot, er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast bespreken we een aantal mogelijke uitbereidingen van dit onderzoek.
-
-Belangrijk om te vermelden is dat alle data en code gebruikt in deze thesis fictief is en enkel dient ter illustratie van de werking van de verschillende technologieën.
+Tot slot, In Hoofdstuk~\ref{ch:conclusie}, wordt er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast bespreken we een aantal mogelijke uitbereidingen van dit onderzoek.

@@ -1,0 +1,28 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{c}{\PYGZsh{} Basis image}
+\PYG{c}{\PYGZsh{} We gebruiken hier NodeJS versie 20}
+\PYG{k}{FROM}\PYG{+w}{ }\PYG{l+s}{node:20}
+
+\PYG{c}{\PYGZsh{} Bepalen van de werkdirectory (waar alle bestanden komen)}
+\PYG{k}{WORKDIR}\PYG{+w}{ }\PYG{l+s}{/app}
+
+\PYG{c}{\PYGZsh{} installeren van NodeJS packages}
+\PYG{k}{COPY}\PYG{+w}{ }package*.json\PYG{+w}{ }./
+\PYG{k}{RUN}\PYG{+w}{ }npm\PYG{+w}{ }install
+
+\PYG{c}{\PYGZsh{} Kopieer de requirements.txt naar de container}
+\PYG{c}{\PYGZsh{} Dit is een tekstbestand met de Python packages die we nodig hebben}
+\PYG{k}{COPY}\PYG{+w}{ }requirements.txt\PYG{+w}{ }./
+
+\PYG{c}{\PYGZsh{} Kopieer alle bestanden naar de container}
+\PYG{k}{COPY}\PYG{+w}{ }.\PYG{+w}{ }.
+
+\PYG{c}{\PYGZsh{} Commando om Python te installeren}
+\PYG{k}{RUN}\PYG{+w}{ }apt\PYGZhy{}get\PYG{+w}{ }update\PYG{+w}{ }\PYG{o}{\PYGZam{}\PYGZam{}}\PYG{+w}{ }apt\PYGZhy{}get\PYG{+w}{ }install\PYG{+w}{ }\PYGZhy{}y\PYG{+w}{ }python3\PYG{+w}{ }python3\PYGZhy{}pip
+
+\PYG{c}{\PYGZsh{} Dependencies installeren die nodig zijn voor de chatbot}
+\PYG{k}{RUN}\PYG{+w}{ }pip3\PYG{+w}{ }install\PYG{+w}{ }\PYGZhy{}\PYGZhy{}no\PYGZhy{}cache\PYGZhy{}dir\PYG{+w}{ }\PYGZhy{}r\PYG{+w}{ }requirements.txt
+
+\PYG{c}{\PYGZsh{} Starten van de Node.js applicatie}
+\PYG{k}{CMD}\PYG{+w}{ }\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}node\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}scripts/chatbotPy.js\PYGZdq{}}\PYG{p}{]}
+\end{MintedVerbatim}
