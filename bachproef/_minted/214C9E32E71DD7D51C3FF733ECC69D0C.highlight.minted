@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{gremlinQuery}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{l+s+sb}{`}
+\PYG{l+s+sb}{     g.addV(\PYGZsq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{label}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{\PYGZsq{})}
+\PYG{l+s+sb}{     .property(\PYGZsq{}id\PYGZsq{}, \PYGZsq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{id}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{\PYGZsq{})}
+\PYG{l+s+sb}{     .property(\PYGZsq{}label\PYGZsq{}, \PYGZsq{}}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{label}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{\PYGZsq{})}
+\PYG{l+s+sb}{     }\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{propertiesString}\PYG{l+s+si}{\PYGZcb{}}
+\PYG{l+s+sb}{     }\PYG{l+s+sb}{`}\PYG{p}{;}
+
+\PYG{k}{await}\PYG{+w}{ }\PYG{n+nx}{client}\PYG{p}{.}\PYG{n+nx}{submit}\PYG{p}{(}\PYG{n+nx}{gremlinQuery}\PYG{p}{)}\PYG{p}{;}
+\end{MintedVerbatim}

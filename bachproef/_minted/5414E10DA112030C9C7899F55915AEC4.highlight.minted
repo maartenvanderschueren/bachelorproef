@@ -1,0 +1,4 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{n+nx}{query}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{query}\PYG{p}{.}\PYG{n+nx}{replace}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}gremlin\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{replace}\PYG{p}{(}\PYG{l+s+s2}{\PYGZdq{}```\PYGZdq{}}\PYG{p}{,}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}\PYGZdq{}}\PYG{p}{)}\PYG{p}{.}\PYG{n+nx}{strip}\PYG{p}{(}\PYG{p}{)}
+\PYG{c+c1}{// ```gremlin g.V().has(\PYGZsq{}name\PYGZsq{}, \PYGZsq{}motor\PYGZsq{})``` ==\PYGZgt{} g.V().has(\PYGZsq{}name\PYGZsq{}, \PYGZsq{}motor\PYGZsq{})}
+\end{MintedVerbatim}

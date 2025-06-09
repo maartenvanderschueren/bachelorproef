@@ -1,0 +1,1990 @@
+Toepassen van een tijdelijke
+grafiektransformatie op object traceringsdata voor het gebruiken van een
+LLM.
+Maarten Van der Schueren.
+
+Scriptie voorgedragen tot het bekomen van de graad van
+Professionele bachelor in de toegepaste informatica
+
+Promotor: Dhr. M. Saelens
+Co-promotor: Dhr. B. Peirens
+Instelling: Tracked
+Academiejaar: 2024–2025
+Eerste examenperiode
+
+Departement IT en Digitale Innovatie .
+
+Woord vooraf
+In deze bachelorproef heb ik me verdiept in het ontwikkelen van een oplossing
+waarmee er met behulp van een chatbot en grafiekmodellering, efficiënt kan worden achterhaald waar in het staalverwerkingsproces van ArcelorMittal een mogelijke fout is ontstaan en of deze fouten kunnen worden voorkomen door foutmeldingen op te zoeken. Dit staalverwerkingsproces is een complex traject waarbij
+het staal start als grondstof die in de fabriek aankomt en eindigt als een afgewerkt
+product dat naar de klant wordt verzonden. Het doel van dit onderzoek is om een
+methode te ontwikkelen die deze foutmeldingen kan weergeven op basis van een
+vraag gesteld door een gebruiker. Door deze vraag te gebruiken in een chatbot, zal
+deze op zijn beurt op zoek gaan naar een antwoord binnen het proces. Daarna verwachten we dat de chatbot dit in een duidelijke samenvatting als antwoord kan
+geven op basis van de gegevens uit de database. Dit onderzoek voer ik uit in samenwerking met mijn co-promotor Bart Peirens van Tracked, die ons ondersteuning biedt bij het traceerproces. Daarnaast zal Tim De Grave (softwarearchitect
+binnen ArcelorMittal Gent) de nodige data aanleveren, waarmee we deze oplossing kunnen realiseren. Ik wil hen beiden hartelijk bedanken voor hun waardevolle
+bijdragen en ondersteuning gedurende dit project. Verder wil ik ook mijn promotor, Martijn Saelens, bedanken voor de begeleiding en het vertrouwen dat hij me
+gegeven heeft tijdens dit traject.
+
+iii
+
+Samenvatting
+In de fabriek van ArcelorMittal Gent worden dagelijks staalrollen geproduceerd die
+met een uniek nummer worden getraceerd. Toch is het vaak onduidelijk waar in
+het proces een fout is ontstaan of welke machines hier invloed op hebben. Dit leidt
+tot inefficiënte zoektochten, wat tijd en middelen kost.
+Dit onderzoek zoekt een methode om procesfouten en andere use cases snel en
+accuraat te identificeren, zodat medewerkers snel informatie kunnen vinden over
+producten of gerelateerde middelen zoals kranen of machines. De bachelorproef
+is opgesteld in opdracht van Tracked, gespecialiseerd in het traceren van goederen en processen. ArcelorMittal Gent vroeg om een oplossing die procestracering
+versnelt en automatiseert, met als doel het zoeken naar informatie eenvoudiger te
+maken.
+De bachelorproef bestaat uit drie delen. Het eerste deel is een literatuurstudie over
+technologieën als Cosmos DB en de Gremlin API, die het opzetten van een grafiekmodel mogelijk maken.
+Het tweede deel behandelt het vertalen van SAP-data naar een grafiekmodel in
+een grafiekdatabase. Hiervoor wordt een JSON-LD-bestand gebruikt, opgebouwd
+met schema.org en GS1 EPCIS-events. Dit bestand wordt via NodeJS en de Gremlin
+API ingeladen in Cosmos DB, wat resulteert in een grafiekmodel waarin data en
+relaties gevisualiseerd en geanalyseerd kunnen worden.
+Het derde deel beschrijft de ontwikkeling van een chatbot die dit grafiekmodel
+kan bevragen en analyseren. De chatbot vertaalt gebruikersvragen naar Gremlinqueries die data uit Cosmos DB ophalen. De relevante knopen en relaties worden
+omgezet in leesbare tekst, waardoor de chatbot antwoorden kan geven op vragen
+zoals: “Geef alle kranen met een melding op de motor.” Dit hoofdstuk gaat ook in
+op het gebruik van Docker voor het beheren van de chatbot, in combinatie met
+Elasticsearch en Ollama-modellen.
+De focus ligt op een beperkte set vragen, omdat een uitgebreide vragenset niet
+het hoofddoel is. Wel wordt een basis gelegd voor een chatbot die vragen over
+het productieproces van ArcelorMittal Gent kan beantwoorden, vooral gericht op
+producttracering en het opsporen van foutmeldingen.
+
+iv
+
+Inhoudsopgave
+Lĳst van figuren
+
+vii
+
+Lĳst van tabellen
+
+viii
+
+Lijst van codefragmenten
+
+ix
+
+1
+
+1
+1
+2
+2
+3
+3
+
+Inleiding
+1.1 Probleemstelling . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.2 Onderzoeksvraag . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.3 Onderzoeksdoelstelling . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.4 Databeschrijving vooraf . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+1.5 Opzet van deze bachelorproef . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+2 Stand van zaken
+4
+2.1 Technische specificaties. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+4
+4
+2.1.1 Grafiekmodellering . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.1.2 Cosmos DB . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5
+7
+2.1.3 API: Apache Gremlin. . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.1.4 REST-API . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+9
+2.1.5 Runtime: NodeJS. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+2.1.6 LLM runtime: Ollama . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 10
+2.1.7 Low Rank Adaptation (LoRA) . . . . . . . . . . . . . . . . . . . . . . . . 14
+2.2 Data preprocessing. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 15
+2.2.1 JSON . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+2.2.2 JSON-LD . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 16
+2.2.3 JSON-LD tot Graph. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 17
+2.3 Datemodellering en structuur . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+2.3.1 GS1 . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 18
+2.3.2 EPCIS-events . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 19
+2.3.3 Schema.org . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 21
+2.4 Chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 22
+2.4.1 Retrieval Augmented Generation . . . . . . . . . . . . . . . . . . . . . 23
+2.4.2 Elasticsearch . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 24
+2.4.3 Docker . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 27
+
+v
+
+vi
+
+Inhoudsopgave
+
+3 Methodologie
+29
+3.1 Dataverwerking . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+3.1.1
+Technologieën voor databases . . . . . . . . . . . . . . . . . . . . . . . 29
+3.2 Proof of concept . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 29
+3.2.1 Opzetten van een grafiekmodel . . . . . . . . . . . . . . . . . . . . . . 29
+3.2.2 Opzetten van een chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . 30
+3.2.3 Structuur chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 31
+32
+4 Conclusie
+4.1 Resultaten. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+4.1.1 Voordelen. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+4.1.2 Nadelen . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 33
+4.2 Toekomstig onderzoek . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 34
+5 Bijlagen
+5.1 Verbinden met Cosmos DB via Gremlin API . . . . . . . . . . . . . . . . . .
+5.2 Voorbeeld Docker-compose bestand . . . . . . . . . . . . . . . . . . . . . . .
+5.3 Voorbeeld Dockerfile voor NodeJS en Python . . . . . . . . . . . . . . . . .
+5.4 Screenshot van de demo video . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.5 Workflow van de chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+35
+36
+37
+38
+39
+39
+
+A Onderzoeksvoorstel
+A.1 Inleiding . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.2 Literatuurstudie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.2.1 Cosmos DB . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.2.2 Grafiek modellering . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.2.3 Retrieval Augmented Generation . . . . . . . . . . . . . . . . . . . . .
+A.2.4 EPCIS . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.3 Methodologie . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+A.4 Verwacht resultaat, conclusie . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+40
+40
+41
+41
+41
+42
+43
+44
+44
+
+Bibliografie
+
+46
+
+Lĳst van figuren
+2.1
+2.2
+2.3
+2.4
+2.5
+
+Voorbeeld Grafiekmodel. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Verbruik Request Units . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+benchmark LLMs. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+Lora principe. . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+GTIN-12 barcode . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+5
+7
+13
+15
+19
+
+3.1
+
+Output chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+31
+
+5.1 Demo video (screenshot) . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+5.2 Workflow van de chatbot . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 39
+A.1 Flowchart . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . 45
+
+vii
+
+Lĳst van tabellen
+2.1
+
+Belangrijkste voordelen van EPCIS volgens GS1 . . . . . . . . . . . . . . . .
+
+viii
+
+21
+
+Lijst van codefragmenten
+2.1 Voorbeeld Gremlin query . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.2 Voorbeeld van een JSON context bestand . . . . . . . . . . . . . . . . . . . .
+2.3 Voorbeeld van een JSON-object . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.4 Voorbeeld van een JSON naar JSON-LD conversie . . . . . . . . . . . . . . .
+2.5 Voorbeeld van een JSON-LD naar Graph conversie . . . . . . . . . . . . . .
+2.6 Voorbeeld JSON-LD bestand . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.7 Voorbeeld JSON vraag . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.8 Voorbeeld van het schoonmaken van de query . . . . . . . . . . . . . . . .
+2.9 Voorbeeld inverted index . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+2.10 Voorbeeld Elasticsearch query bepalen . . . . . . . . . . . . . . . . . . . . . .
+5.1 Voorbeeld verbinding met CosmosDB via Gremlin API. . . . . . . . . . . .
+5.2 Voorbeeld Docker-compose . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+5.3 Voorbeeld Dockerfile . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . . .
+
+ix
+
+9
+14
+16
+17
+18
+22
+23
+24
+26
+27
+36
+37
+38
+
+1
+Inleiding
+In de moderne industriële wereld is efficiëntie en performantie cruciaal, vooral binnen ingewikkelde toeleveringsketens zoals die van ArcelorMittal Gent. Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling en preventie van
+fouten, door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLMs). Door traceringsdata om te zetten naar een
+grafiekmodel en dit te koppelen aan een LLM, kunnen bedrijven in staat gesteld
+worden om sneller en nauwkeuriger de oorzaken van problemen te achterhalen.
+Dit onderzoek, uitgevoerd in samenwerking met Tracked, een bedrijf van de Cronos groep gespecialiseerd in traceringsdata, heeft als doel om schaalbare en performante oplossingen te bieden die de efficiëntie en klanttevredenheid optimaliseren.
+Voor dit onderzoek maken we gebruik van een installatieboom die alle onderdelen
+van het productieproces bevat.
+Let op dat de data die we gebruiken omtrent dit proces louter fictief is en enkel
+dient ter illustratie van de werking van de verschillende technologieën. In 1.4 wordt
+er meer uitleg gegeven over de data die we gebruiken aangezien we niet de originele data hebben gebruikt om dit onderzoek te volbrengen. De reden hiervoor is
+dat de originele data vertrouwelijk is en niet openbaar kan worden gemaakt. Daarnaast is er ook gevraagd om een minim aantal code weer te geven in de thesis, dit
+om de data zo confidentieel mogelijk te houden.
+
+1.1. Probleemstelling
+In de complexe toeleveringsketen van ArcelorMittal Gent zijn er veel verschillende
+processen die verspreid zijn over meerdere afdelingen. Deze processen omvatten
+onder andere de productie, verpakking en logistiek. Elke afdeling heeft specifieke
+processen en datamodellen, wat het analyseren en onderzoeken van gegevens
+over afdelingen heen zeer complex en tijdrovend maakt. Dit leidt tot inefficiënties
+1
+
+2
+
+1. Inleiding
+
+in de klachtenafhandeling of onderhoudsprocessen, en verhoogt de operationele
+kosten. Er is behoefte aan een schaalbare en performante oplossing die bedrijven
+in staat stelt sneller en nauwkeuriger de oorzaken van problemen te achterhalen,
+waardoor duur en tijdrovend handmatig werk wordt verminderd. Dit is een erkend
+probleem voor zowel kleine bedrijven (zoals bijvoorbeeld kleine ondernemingen)
+en zeker bij grote bedrijven (zoals in dit geval ArcelorMittal), waarbij het staal een
+grote weg aflegt en niet alleen in Gent blijft. Dit staal wordt namelijk geproduceerd,
+verwerkt en gebruikt in verschillende regio’s, daarnaast zijn er ook verschillende logistieke middelen die het staal vervoeren naar de klant (zoals een boot, trein of
+vrachtwagen).
+
+1.2. Onderzoeksvraag
+De voornaamste onderzoeksvraag luidt als volgt: ‘Hoe kunnen we efficiënt en snel
+grafiekmodellering toepassen en met behulp van een large language model (LLM)
+een chatbot ontwikkelen die in staat is om het waar, wanneer, wat en hoe van
+gebeurtenissen binnen een proces vast te stellen ter ondersteuning van klachtenafhandeling bij productfouten?‘
+Daarnaast zijn belangrijke deelvragen:
+• Hoe kunnen we SAP-data omzetten naar een grafiekmodel?
+• Hoe maken we gebruik van de GS1 standaarden om de data correct te structureren?
+• Hoe kunnen we een LLM gebruiken om gebeurtenissen binnen een proces
+vast te stellen?
+• Hoe kunnen we een chatbot ontwikkelen die een LLM kan bevragen en een
+gepast antwoord kan geven op de gestelde vraag?
+
+1.3. Onderzoeksdoelstelling
+De doelstelling van deze bachelorproef is om een schaalbare en performante oplossing te ontwikkelen die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken
+van problemen binnen hun toeleveringsketen te achterhalen. Dit wordt bereikt
+door het toepassen van grafiekmodellering op traceringsdata en het gebruiken van
+een large language model (LLM). Het uiteindelijke doel is om de operationele efficiëntie te verbeteren en de klanttevredenheid te optimaliseren door een efficiënte
+klachtenafhandeling mogelijk te maken.
+Binnen de doelstelling van deze bachelorproef wordt er nogmaals benadrukt dat
+er gebruik gemaakt wordt van fictieve data gebasseerd op de boomstructuur van
+ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. Daarbij is het
+doel dat we kunnen vragen: “Geef alle machines met een alarm op de motor.”, en
+dat de chatbot dit kan beantwoorden.
+
+1.4. Databeschrijving vooraf
+
+3
+
+1.4. Databeschrijving vooraf
+Vooraleer er aan de slag gegaan wordt met deze bachelorproef, is het belangrijk
+om te weten welke data precies beschikbaar is en hoe die eruitziet.
+Aan het begin van deze thesis werd er een SAP-boomstructuur in JSON-formaat
+aangeleverd, die alle onderdelen van het productieproces bevat. Dit bestand is
+enorm groot (meer dan 50.000 JSON-objecten) en bevat bovendien een groot aantal eigenschappen per object. Door deze complexiteit is het moeilijk om meteen
+met de volledige dataset te werken tijdens de ontwikkeling van de chatbot.
+Om sneller te kunnen testen en ontwikkelen, wordt er daarom gekozen voor een
+mock dataset. Deze heeft dezelfde structuur als de originele data, maar maakt gebruik van fictieve sleutel-waarde paren en een veel kleiner aantal records. Hierdoor
+kan de initiële opzet en het testen uitgevoerd worden zonder dat telkens de volledige dataset moet worden ingeladen.
+Voor de verdere ontwikkeling van het project maakt het geen verschil of de mockdata of de echte data wordt gebruikt. De scripts in zowel JavaScript als Python zijn
+generiek opgebouwd en functioneren zolang de datastructuur ongewijzigd blijft.
+Doorgaans start het proces met een JSON-bestand dat via een Python-script wordt
+omgezet naar JSON-LD. Dit JSON-LD-bestand kan vervolgens rechtstreeks in Cosmos DB worden ingeladen.
+In figuur 2.1 is een voorbeeld te zien van hoe de mock-data eruitziet in grafiekvorm.
+
+1.5. Opzet van deze bachelorproef
+De bachelorproef is als volgt opgebouwd:
+Eerst en vooral, in hoofdstuk 2 wordt er een overzicht gegeven over welke technologieën hiervoor gebruikt zijn. Daarnaast wordt er ook een overzicht gegeven van
+de literatuur die relevant is voor dit onderzoek.
+Daarna wordt er in hoofdstuk 3 de methodologie toegelicht en worden de gebruikte
+onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de
+onderzoeksvragen. Zo wordt besproken hoe de SAP-data kan worden omgezet
+naar een grafiekmodel, waarom er gebruik wordt gemaakt van een LLM en hoe
+deze wordt geïmplementeerd via een REST-API. Dit alles wordt opgebouwd in Docker om flexibel te zijn met de onderliggende infrastructuur, waardoor de chatbot
+eenvoudig kan worden beheerd.
+Tot slot, in hoofdstuk 4, wordt er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast worden een aantal
+mogelijke uitbereidingen voor dit onderzoek besproken.
+Indien er gerefereerd wordt naar een bijlage, maar verder geen uitleg over gegeven
+wordt, kan je die bijlage vinden in hoofdstuk 5.
+
+2
+Stand van zaken
+2.1. Technische specificaties
+In dit eerste hoofdstuk worden de technische specificaties besproken van de verschillende technologieën die in deze bachelorproef gebruikt worden. Er wordt dieper ingegaan op het gebruik van Cosmos DB, NodeJS, de Gremlin API en de verschillende AI-modellen die ingezet worden om de data te bevragen en te analyseren. Daarnaast worden ook andere technische mogelijkheden besproken die getest zijn, maar uiteindelijk niet gebruikt werden, inclusief de bijbehorende redenen.
+
+2.1.1. Grafiekmodellering
+Grafiekmodellering is een techniek die gebruikt wordt om de data te visualiseren
+en te analyseren (neo4j, 2025). Deze data wordt opgeslagen in een grafiekdatabase
+zoals Cosmos DB (Azure, 2024). In deze bachelorproef wordt grafiekmodellering
+gebruikt om de verbanden te leggen tussen de verschillende processen binnen
+ArcelorMittal Gent. Dit gebeurt doordat één of meerdere knopen verbonden zijn
+met andere knopen door middel van een relatie. Een knoop stelt een entiteit voor,
+zoals een persoon, een product of een proces. Een verbinding stelt de relatie tussen
+de verschillende knopen voor, zoals een associatie, transformatie of transactie van
+een product (Byun & Kim, 2020). Dit kan in ons geval een kraan zijn die verbonden
+is met een machine. Hierbij zijn de kraan en de machine de knopen en is de relatie
+een associatie tussen deze knopen.
+Om de traceerbaarheid te behouden wordt bij het wijzigen van een knoop ook de
+tijdstempel opgeslagen van deze wijziging, zodat er altijd kan worden opgevraagd
+wanneer deze knoop is gewijzigd. De relatie zal in dit geval worden omgezet naar
+een “has-event”-relatie die een “delete event” eigenschap bevat, zegt (Byun & Kim,
+2020). Deze “delete” wordt gedaan door de knopen van uitgaande relaties op te
+slaan, de huidige relatie te verwijderen en een nieuwe relatie toe te voegen met
+4
+
+2.1. Technische specificaties
+
+5
+
+elke opgeslagen uitgaande knoop.
+Elke knoop bevat ook eigenschappen die zichzelf beschrijven, zoals het bouwjaar,
+het laatste onderhoud of zelfs sensordata, zoals een alarm op de machine. Deze
+data wordt opgeslagen als sleutel-waarde paren om dit later efficiënt te kunnen
+ophalen, door in de query te vragen naar de sleutel en de waarde. In figuur 2.1
+is een voorbeeld te zien van een grafiekmodel met fictieve data dat opgezet is in
+Cosmos DB. Daarnaast is er in schema 5.2 een visuele voorstelling van de workflow
+van de chatbot die is opgezet.
+
+Figuur 2.1: Voorbeeld van kleinschalig grafiekmodel, gemaakt met mock data.
+
+2.1.2. Cosmos DB
+Cosmos DB is een NoSQL-database van het Microsoft Azure-ecosysteem. Het biedt
+een lage latentie, is beschikbaar voor verschillende API’s en kan grote hoeveelheden data verwerken met een hoge beschikbaarheid, wat belangrijk is in ons project (A. Microsoft, 2024). Daarnaast is Cosmos DB horizontaal schaalbaar, wat betekent dat er op piekmomenten tot een miljoen lees- en schrijfaanvragen verwerkt
+kunnen worden door het benodigde aantal servers toe te voegen. De hoge beschikbaarheid wordt gegarandeerd door replicatie, waardoor er snel kan worden
+overgeschakeld als er een probleem is in onze database.
+Binnen ArcelorMittal wordt gebruikgemaakt van onder andere de Azure-omgeving
+van Microsoft, waardoor Cosmos DB een logische keuze is voor ons project. Cosmos
+DB ondersteunt verschillende API’s zoals SQL, MongoDB, Cassandra, Gremlin en
+Table API, waardoor er flexibel kan worden gewerkt met verschillende soorten data.
+In deze thesis wordt gebruikgemaakt van Cosmos DB, omdat dit een grafiekdatabase bevat die ons in staat stelt om de data te structureren en te doorzoeken op
+basis van de relaties tussen de verschillende knopen. Om op een later moment
+verbanden te kunnen leggen tussen processen binnen ArcelorMittal Gent, is dit
+
+6
+
+2. Stand van zaken
+
+onderdeel noodzakelijk voor het project.
+Om de query’s uit te voeren op Cosmos DB wordt gebruikgemaakt van de Gremlin
+API, wat later uitgebreid wordt besproken in 2.1.3. Voor deze thesis is er gebruikgemaakt van Cosmos DB, die een free tier heeft met een beperkte hoeveelheid
+Request Units (RU’s) per seconde. Dit is een gratis versie van Cosmos DB die verkrijgbaar is via het studenten-abonnement van Microsoft Azure. In productie zou
+gebruik worden gemaakt van de betaalde versie van Cosmos DB, die meer Request
+Units (RU’s) per seconde kan verwerken en meer opslagcapaciteit biedt. In het volgende hoofdstuk gaan we dieper in op hoe de kosten bepaald worden, en welke
+schaalmodellen beschikbaar zijn.
+In codefragment 5.1 is een voorbeeld te zien van hoe er verbinding wordt gemaakt
+met de database. Dit gebeurt via de Gremlin API, waarbij er een authenticator gebruikt wordt om verbinding te maken met de database. Alle configuratiegegevens,
+zoals de databasenaam, collectienaam, endpoint en primary key, worden opgeslagen in een aparte configuratiefile, zodat deze gemakkelijk kunnen worden aangepast zonder de code te wijzigen. Door deze functie in een apart script te plaatsen
+en te exporteren, kan deze functie overal waar het nodig is gebruikt worden in de
+chatbot. Dit zorgt er ook voor dat als er iets verandert aan de verbinding met de database, dit slechts op één plaats hoeft te worden aangepast en niet in elke functie
+die de database gebruikt.
+Request Units (RU)
+Cosmos DB werkt met Request Units (RU’s), een abstracte maat voor de hoeveelheid systeembronnen (zoals CPU, geheugen en I/O) die nodig zijn om een bepaalde
+bewerking of query uit te voeren (Brown, Andrews e.a., 2024). Elke bewerking krijgt
+een aantal Request Units toegewezen afhankelijk van de complexiteit en de gebruikte API, zegt Brown, Andrews e.a. (2024).
+Bij het bekijken van de resource-monitor van de Cosmos Database, werd er voor
+een query zoals “Geef alle kranen met een alert op de motor” ongeveer 10 RU’s gerekend. Voor dit onderzoek is er minder rekening gehouden met de RU’s, aangezien
+er met een kleine dataset gewerkt wordt en de kosten veel lager zullen zijn dan
+in een productieomgeving. Daarnaast maakt het aantal gebruikers ook een aanzienlijk verschil in de kosten, wat op dit moment nog niet kan worden ingeschat.
+In figuur 2.2 is te zien hoeveel RU’s er gebruikt zijn bij het testen van de chatbot.
+Hierbij is te zien dat als er op één dag veel gebruikgemaakt wordt van de chatbot
+door één persoon, dat er al snel gemiddeld 200 RU’s gebruikt worden. Dit komt
+voor één regio (bijvoorbeeld Europa) neer op ongeveer 10 tot 15 euro per maand,
+wat voor grote bedrijven vaak een verwaarloosbaar bedrag is (M. Azure, z.d.). Indien
+er toch veel rekening gehouden moet worden met de kosten, is het belangrijk om
+het juiste schaalmodel te kiezen en de juiste overwegingen te maken.
+Bij Microsoft Azure zijn er verschillende manieren om te betalen voor verbruik (of
+RU’s) in Cosmos DB, afhankelijk van het benodigde schaalmodel:
+
+2.1. Technische specificaties
+
+7
+
+• Bij provisioned throughput reserveer je een vast aantal Request Units per seconde (RU/s), waarvoor je betaalt ongeacht of je ze volledig gebruikt. Dit model is geschikt voor toepassingen met een constante of voorspelbare belasting (Microsoft, 2024b).
+• Bij serverless throughput betaal je enkel voor het aantal RU’s dat effectief verbruikt wordt. Aan het einde van de facturatieperiode wordt het totale verbruik
+aangerekend. Dit model is ideaal voor sporadisch gebruik of ontwikkelomgevingen met een lage belasting (Microsoft, 2025).
+• Met autoscale throughput stel je een maximumcapaciteit in, waarna Cosmos
+DB automatisch schaalt tussen 10% en 100% van die waarde, afhankelijk van de
+werkelijke belasting (Microsoft, 2024d). Het voordeel van autoscale throughput is dat je geen handmatige schaling hoeft te doen. Een nadeel daarentegen is dat je altijd minimaal 10% van de ingestelde maximumwaarde betaalt,
+wat bij lage activiteit duurder kan uitvallen dan het serverless model.
+
+Figuur 2.2: Verbruik Request Units één testdag met één persoon.
+
+2.1.3. API: Apache Gremlin
+Om ervoor te zorgen dat de data kan worden opgehaald en bevraagd in Cosmos
+DB, wordt de Gremlin API van Apache TinkerPop gebruikt (Tinkerpop, 2023a). Apache TinkerPop is een framework voor grafiekberekeningen dat gebruikt wordt voor
+grafiekdatabases en grafiekanalyses. Het protocol van Gremlin is gebaseerd op een
+REST-API die communiceert tussen de database en de chatbot, waardoor er na be-
+
+8
+
+2. Stand van zaken
+
+vraging een antwoord gegeven wordt met de gegevens uit deze database (Medina,
+2021).
+De taal bevat verschillende varianten voor verschillende programmeertalen, zoals
+Gremlin-Java, Gremlin-Python en Gremlin-Groovy. In ons geval zal Gremlin-JavaScript
+gebruikt worden om de data in Cosmos DB te bevragen, aangezien de databaseverbinding via JavaScript geïnitieerd wordt. In JavaScript wordt er gebruikgemaakt
+van de Gremlin client, die de Gremlin API gebruikt om verbinding te maken met
+de database en de query’s uit te voeren. Een voorbeeld van de Gremlin client is te
+zien in codefragment 5.1.
+Hiernaast is ook Neo4J overwogen met Cypher als querytaal, maar deze heeft zijn
+eigen ecosysteem en is niet even flexibel en schaalbaar als de Gremlin API. Gremlin daarentegen voorziet dat alle databases die TinkerPop-enabled zijn, kunnen
+gebruikt worden. Dit zijn databases die ondersteund worden door het Apache
+TinkerPop-framework. Hieronder vallen onder andere Amazon Neptune, Cosmos
+DB, JanusGraph en nog vele andere (Tinkerpop, 2023b).
+Via de Gremlin API kunnen verschillende vragen worden gesteld aan de database
+en wordt de benodigde data opgehaald. Zo kan er gevraagd worden welke knopen
+er zijn, hoeveel uitgaande relaties er zijn, en kan er gezocht worden naar specifieke
+labels.
+Een belangrijke notitie is dat Gremlin case-sensitive is, wat betekent dat de juiste
+hoofdletters moeten worden gebruikt in de query’s. De hoofdlettergevoeligheid
+kan er namelijk voor zorgen dat een query niet werkt omdat hij zoekt naar exact
+het woord. Hiervoor zijn alle values in de database omgezet naar kleine letters via
+een klein Python-script, zodat er geen problemen ontstaan bij het ophalen van de
+data. Daarnaast zijn er bepaalde sleutelwaarden die in Cosmos DB ook de juiste
+hoofdletters moeten hebben (zoals label en name), hiervoor is er een kleine lijst
+meegegeven aan de chatbot die de woorden met de nodige juiste hoofdletters
+bevat. Om dit te doen, worden met Python alle keys opgehaald uit de database
+en opgeslagen in een lijst. Daarna maakt het Large Language Model een query en
+kijkt het voor elk woord of dit in de lijst aanwezig is. Indien de string in de lijst staat,
+wordt de hoofdlettergevoeligheid behouden, anders wordt de string omgezet naar
+kleine letters.
+In codefragment 2.1 is een voorbeeld te zien van een Gremlin-query die de knopen
+verbonden met machine 1 ophaalt. Zoals te zien in dit codefragment, is er een query
+voor het opschonen en een query na het opschonen van de hoofdlettergevoeligheid. Daarin is te zien dat alles wat in kleine letters moet staan, ook in kleine letters
+staat. Hierbij wordt gebruikgemaakt van de outE-functie, die de uitgaande relaties
+ophaalt van de knoop, en de inV-functie, die de inkomende knopen ophaalt.
+
+2.1. Technische specificaties
+1
+2
+
+9
+
+-- Query voor het opschonen
+g.V().HAS('label', 'MACHINE 1').OUTE('IS_ASSOCIATED').INV()
+
+3
+4
+5
+
+-- Query na het opschonen
+g.V().has('label', 'machine 1').outE('is_associated').inV()
+Codefragment 2.1: Voorbeeld van een Gremlin query die de knopen ophaalt uit de database.
+
+2.1.4. REST-API
+Om de communicatie tussen de chatbot en de database te voorzien, wordt er gebruikgemaakt van een REST-API, ofwel Representational State Transfer Application
+Programming Interface (IBM, 2021). Een REST-API is een manier om flexibel en lichtgewicht te communiceren tussen verschillende applicaties via HTTP-verzoeken. Ze
+maakt gebruik van de CRUD-operaties, oftewel GET, POST, PUT en DELETE, om gegevens op te halen, toe te voegen, bij te werken of te verwijderen.
+De REST-architectuur werd voor het eerst ontworpen door Roy Fielding in 2000
+en is sindsdien een populaire manier geworden om webservices te bouwen. Daarnaast is een REST-API ook stateless, wat betekent dat elke aanvraag onafhankelijk
+is van de andere aanvragen en dat er geen informatie wordt opgeslagen tussen
+sessies.
+Voor deze use case wordt gebruikgemaakt van een POST-request waarbij de vraag
+van een gebruiker wordt doorgegeven. Als antwoord komt er een JSON-object terug met de resultaten van de query uit de database. Indien er een knoop of relatie
+“verwijderd” moet worden, moet er een DELETE-request uitgevoerd worden, ook
+dit is mogelijk via de REST-API. Als nuance is het belangrijk te vermelden dat een
+knoop of relatie nooit echt verwijderd wordt, maar enkel gemarkeerd wordt als verwijderd.
+Het voordeel van een REST-API is dat deze platformonafhankelijk is en gemakkelijk
+geïntegreerd kan worden met andere systemen. Dit komt doordat de requests
+uitgevoerd worden via HTTP, ofwel Hypertext Transfer Protocol (Combell, z.d.). Om
+hier niet te diep op in te gaan, is het belangrijk om te weten dat HTTP een protocol
+is dat gebruikt wordt om gegevens te verzenden over het internet.
+Kort samengevat wordt er een POST-request met de vraag van de gebruiker naar
+de server verstuurd. Daarna geeft de server een antwoord terug met de resultaten
+van de query uit de database. Deze resultaten worden verwerkt door het Large Language Model, dat een samenvatting maakt van de resultaatset en deze terugstuurt
+naar de gebruiker als een duidelijk, maar beknopt antwoord.
+
+10
+
+2. Stand van zaken
+
+2.1.5. Runtime: NodeJS
+NodeJS is een open-source JavaScript-runtimeomgeving die de mogelijkheid biedt
+om JavaScript-code uit te voeren op een server (Altexsoft, 2022). Via NodeJS kan
+een lokale server opgezet worden die de communicatie tussen de chatbot en de
+database mogelijk maakt.
+NodeJS werkt via een single-threaded, non-blocking I/O-model, wat betekent dat
+er geen nieuwe threads worden aangemaakt voor elk verzoek. Door middel van
+callbacks en promises werkt NodeJS asynchroon. Dit houdt in dat het systeem
+niet blokkeert terwijl het wacht op bijvoorbeeld een antwoord van de database.
+In plaats daarvan kan de server ondertussen andere taken uitvoeren of verzoeken
+afhandelen. Dit is belangrijk bij deze toepassing, waar grote hoeveelheden data
+worden verwerkt, zodat het systeem efficiënt blijft en niet onnodig stilvalt tijdens
+trage bewerkingen zoals grote query’s. Met event loops worden de taken in een
+wachtrij geplaatst en verwerkt wanneer de server klaar is met een andere operatie.
+Daardoor is NodeJS zeer performant en schaalbaar voor het verwerken van grote
+hoeveelheden data.
+De technologie werd in 2009 ontwikkeld en geïntroduceerd door Ryan Dahl en
+is sindsdien zeer populair geworden binnen de webontwikkeling. NodeJS wordt
+tegenwoordig gebruikt door grote bedrijven zoals Netflix, eBay en Uber voor hun
+back-end systemen. Zoals eerder vermeld is het geen framework, maar een runtimeomgeving.
+In een schone NodeJS-installatie zijn er slechts een beperkt aantal specifieke modules of bibliotheken aanwezig, waardoor het een zeer lichte en flexibele omgeving
+is om mee te werken. De aanwezige modules zijn standaardmodules (core modules), zoals http, fs (file system) en path. Deze zorgen voor de basisfunctionaliteit
+bij het opzetten van een server en het werken met bestanden. Deze modules zijn
+vaak nodig om folders en bestanden te beheren, daarom worden ze ‘standaardmodules’ genoemd (Kumar, 2023). Naast deze standaardmodules zijn er ook veel
+externe modules beschikbaar via npm (Node Package Manager), die gebruikt kunnen worden om de functionaliteit van NodeJS uit te breiden.
+
+2.1.6. LLM runtime: Ollama
+Om later in deze bachelorproef een chatbot op te bouwen, wordt er gebruikgemaakt van Ollama, een wrapper die het mogelijk maakt om verschillende Large
+Language Models (LLMs) lokaal te draaien op een server (Manandhar, 2025). Dit
+is een open-sourcebibliotheek die verschillende vooraf getrainde modellen bevat,
+zoals de LLaMA-modellen van Meta, de Phi-modellen van Microsoft en nog vele andere. Naast het gebruik van modellen die standaard beschikbaar zijn via Ollama, is
+het ook mogelijk om bepaalde Hugging Face-modellen te integreren die lokaal of
+in een Docker-container kunnen worden opgezet (HuggingFace, 2024).
+Dankzij dit brede aanbod aan bestaande pretrained modellen kunnen er snel ver-
+
+2.1. Technische specificaties
+
+11
+
+gelijkingen worden gemaakt door eenvoudig nieuwe modellen op te halen via
+Ollama. Dit is een groot voordeel, aangezien de scope van deze thesis niet ligt
+bij het volledig ontwikkelen of trainen van een eigen LLM voor natuurlijke taalverwerking of het genereren van Gremlin-query’s. Wel wordt er gezocht naar het
+meest geschikte bestaande model voor deze taken, eventueel aangevuld met finetuning. Dat vormt echter een uitdaging, omdat er verschillende versies van Gremlin bestaan met afwijkende querysyntaxis, en omdat er momenteel geen gespecialiseerde modellen beschikbaar zijn voor het genereren van Gremlin-query’s. Met
+behulp van Retrieval-Augmented Generation (RAG) en Elasticsearch wordt dit probleem deels ondervangen. In hoofdstuk 2.4 wordt hier dieper op ingegaan.
+Tijdens de testfase zijn meerdere modellen geëvalueerd, waaronder LLaMA, CodeLLaMA en Phi-4. De LLaMA-modellen (LLaMA2 en LLaMA3) bleken redelijk goed in
+het omzetten van databankgegevens naar natuurlijke taal, maar hadden moeite
+met het genereren van correcte Gremlin-query’s. CodeLLaMA gaf, mits de nodige
+finetuning, vaak betere resultaten bij het genereren van deze query’s, maar bleek
+minder sterk in het formuleren van natuurlijke antwoorden op basis van de verkregen data. Over het algemeen blijft het een uitdaging om Gremlin-query’s te
+genereren met een LLM, omdat deze modellen niet specifiek getraind zijn op de
+syntaxis van Gremlin. In sectie 2.1.7 wordt een methode besproken waarmee een
+model kan worden gefinetuned op Gremlin-syntaxis, maar dit is niet verder onderzocht binnen deze thesis wegens beperkte rekenkracht en tijd.
+Tot slot werd ook Phi-4 getest, een model ontwikkeld door Microsoft. Dit model is
+performanter (en dus sneller) dan de LLaMA-modellen, en gaat efficiënt om met de
+verkregen input. In het volgende hoofdstuk wordt dieper ingegaan op de geteste
+modellen, hun prestaties en de uiteindelijke keuze voor een combinatie van twee
+verschillende modellen.
+Llama2
+LLaMA 2 is een open-source Large Language Model ontwikkeld door Meta AI (Touvron e.a., 2023). Het model is beschikbaar in verschillende versies, met groottes
+variërend van 7 tot 70 miljard parameters, afhankelijk van de gekozen configuratie. LLaMA 2 werd ontwikkeld om te concurreren met andere geavanceerde taalmodellen zoals GPT-3.5 en GPT-4. De training van het model is gebaseerd op een
+combinatie van supervised finetuning en reinforcement learning met menselijke
+feedback (RLHF). Net als bij andere LLMs blijven uitdagingen zoals hallucinaties en
+bias aanwezig, en kunnen deze tijdens gebruik blijven optreden.
+Llama3
+LLaMA 3 is de opvolger van LLaMA 2 en vormt een state-of-the-art Large Language Model ontwikkeld door Meta AI (Meta, 2024). Met state-of-the-art wordt bedoeld dat het model gebruikmaakt van de nieuwste technieken en algoritmes om
+de prestaties te optimaliseren. LLaMA 3 bevat verschillende verbeteringen ten op-
+
+12
+
+2. Stand van zaken
+
+zichte van zijn voorganger, waaronder een grotere trainingsdataset en een verfijnde architectuur. Net als LLaMA 2 is ook dit model beschikbaar in verschillende
+versies, met parametergroottes variërend van 7 tot 70 miljard, afhankelijk van de
+gekozen configuratie.
+Daarnaast toont LLaMA 3 licht verbeterde codeerprestaties, bijvoorbeeld bij het genereren van Python- of JavaScript-code. Uit onze testen bleek echter dat het model, net als zijn voorgangers, moeite blijft hebben met het genereren van correcte
+Gremlin-query’s. Hoewel LLaMA 3 op sommige vlakken even goed of zelfs beter
+presteert dan Phi-4, blijkt uit grafiek 2.3 dat het model voor vergelijkbare antwoordkwaliteit ongeveer vijf keer groter is dan Phi-4. Hierdoor is het model aanzienlijk
+zwaarder en trager, wat het minder geschikt maakt voor implementatie binnen
+dit project.
+Phi-4
+Phi-4 is een state-of-the-art Large Language Model ontwikkeld door Microsoft en
+bevat 14 miljard parameters (Kamar, 2024). Het model is ontworpen als een compact, maar krachtig en performant alternatief dat kan concurreren met grotere modellen zoals LLaMA 3, zoals eerder besproken. Uit de uitgevoerde testen bleek dat
+Phi-4 over het algemeen sneller werkt en sterke prestaties levert op het gebied van
+natuurlijke taalverwerking, in vergelijking met andere omvangrijke modellen.
+Figuur 2.3 toont de resultaten van de MMLU-benchmark (Massive Multitask Language Understanding), een benchmark die de prestaties van taalmodellen test op
+verschillende domeinen zoals programmeren, wiskunde en taal. Uit deze figuur
+blijkt dat Phi-4 een hoge score behaalt die vergelijkbaar is met het zwaarste model
+uit de LLaMA 3-reeks. Dit maakt Phi-4 in deze context bijzonder geschikt: het biedt
+sterke prestaties binnen een lichtgewicht configuratie, wat cruciaal is in toepassingen waar snelheid en efficiëntie van belang zijn.
+Binnen dit project wordt gebruikgemaakt van de 14 miljard parameters tellende,
+gekwantiseerde versie van Phi-4. Een gekwantiseerd model is geoptimaliseerd
+voor lagere geheugengebruik en rekencapaciteit, met slechts een minimale en
+doorgaans verwaarloosbare impact op de nauwkeurigheid van de gegenereerde
+tekst (Qdrant, z.d.).
+Volgens Microsoft (2024a) is Phi-4 goed inzetbaar in chatbottoepassingen, onder
+andere dankzij de mogelijkheid tot eenvoudige finetuning en contextuele aanpassingen. Het model is in staat om instructies en context op te nemen, bijvoorbeeld
+via prompt-injectie zoals: “Je bent een expert in het beantwoorden van vragen over
+Cosmos DB. De belangrijkste informatie die je kan gebruiken staat in het items object van de JSON-response.” Dankzij de ondersteuning voor meer dan 40 talen kan
+deze context ook in het Nederlands worden opgegeven, hoewel de hoogste prestaties doorgaans in het Engels worden behaald. Toch zijn de resultaten in het Nederlands zeer goed: de antwoorden zijn grammaticaal correct, bevatten accurate
+samenvattingen van de data, en klinken professioneel en gepast voor de beoogde
+
+2.1. Technische specificaties
+
+13
+
+bedrijfsomgeving.
+Om die reden wordt Phi-4 in dit project gebruikt voor het interpreteren van de
+resultaten uit de JSON-response en het genereren van natuurlijke, beknopte en
+duidelijke antwoorden naar de gebruiker toe.
+
+Figuur 2.3: Benchmark verschillende LLMs op de MMLU benchmark.
+
+CodeLLaMA
+Naast de LLaMA-modellen en Phi-4 is ook CodeLLaMA getest. Dit is een opensource model ontwikkeld door Meta AI, specifiek ontworpen voor het genereren en
+begrijpen van code (Rozière, Gehring e.a., 2023). Het model is getraind op verschillende programmeertalen zoals Python, JavaScript, C++ en vele anderen. Hierdoor
+ligt het gebruik van CodeLLaMA voor het genereren van Gremlin-query’s voor de
+hand.
+CodeLLaMA is in staat om beter te redeneren en functiekettingen te construeren,
+wat essentieel is bij Gremlin-query’s. Dit wordt mede mogelijk gemaakt door de uitgebreide training op diverse programmeertalen. Functiekettingen verwijzen naar
+het opvolgend aanroepen van verschillende functies binnen een query, zoals V()
+om knopen op te halen, en has() om te filteren op specifieke sleutel-waardeparen.
+Een voorbeeld hiervan is te vinden in codefragment 2.1.
+Door voorbeeldquery’s in een JSON-bestand aan het model mee te geven, kan CodeLLaMA de logica van SQL-query’s vertalen naar vergelijkbare Gremlin-structuren.
+In deze thesis is gekozen voor een JSON-bestand omdat dit een duidelijke en eenvoudig te begrijpen structuur biedt om query’s vast te leggen. Oorspronkelijk werd
+een CSV-bestand gebruikt, maar dit bleek foutgevoelig te zijn door problemen
+zoals onjuiste aanhalingstekens en onbedoelde kolomsplitsingen door komma’s.
+JSON voorkomt deze problemen doordat het data als objecten met sleutel-waardeparen
+opslaat. In plaats van aparte kolommen voor vraag en antwoord bevat het JSONobject deze als gekoppelde sleutel-waardeparen. Een voorbeeld hiervan is te zien
+
+14
+
+2. Stand van zaken
+
+in codefragment 2.2.
+Hoewel CodeLLaMA sterk is in het genereren van code, is het model minder geschikt voor het beantwoorden van vragen in natuurlijke taal, de antwoorden zijn
+vaak (grammaticaal) slecht geformuleerd. Het model bestaat in verschillende groottes, variërend van 7 tot 70 miljard parameters, en kent diverse versies, zoals gekwantiseerde en instructiemodellen (HuggingFace, z.d.). De gekwantiseerde versie is
+geoptimaliseerd voor snelheid en geheugen, met een lichte daling in nauwkeurigheid, terwijl de instructieversie beter is in het opvolgen van opdrachten en het
+ondersteunen van programmeertaken.
+In dit project wordt gebruikgemaakt van de 7 miljard parameters, gekwantiseerde
+instructieversie van CodeLLaMA. Deze versie is lichtgewicht, kan instructies goed
+opvolgen, en zorgt voor minimale prestatieproblemen. Met instructies wordt bedoeld dat het model beter omgaat met het begrijpen van de vragen en opdrachten. CodeLLaMA wordt alleen gebruikt voor het genereren van Gremlin-query’s. De
+analyse en interpretatie van de opgehaalde data wordt vervolgens uitgevoerd door
+Phi-4, dat lichter en sneller is in het genereren van natuurlijke taalantwoorden.
+1
+
+{
+”vraag”: ”Geef alle motoren”,
+”antwoord”: ”g.V().has('name', containing('motor'))”
+
+2
+3
+4
+
+},
+Codefragment 2.2: Voorbeeld JSON met vraag en query.
+
+2.1.7. Low Rank Adaptation (LoRA)
+Low Rank Adaptation (LoRA) is een techniek die het mogelijk maakt om grote taalmodellen te finetunen met een beperkte hoeveelheid data (Cloudflare, z.d.). Aan
+het begin van deze thesis zijn verschillende modellen besproken, zoals Phi-4 en
+CodeLLaMA, die gebruikt worden voor het verwerken van natuurlijke taal en het
+omzetten van gebruikersvragen naar Gremlin-query’s. Gremlin is echter een zeer
+specifieke taal, die door de verschillende versies en syntaxisvariaties niet altijd eenvoudig automatisch gegenereerd kan worden.
+Met behulp van LoRA zoud een oplossing mogelijk zijn door kleine, gerichte aanpassingen toe te voegen aan een bestaand model via een instructiedataset. Een
+machine learning-model bestaat namelijk uit een combinatie van een algoritme
+en een dataset. In het geval van LoRA worden de originele modelgewichten bevroren en worden er extra, low-rank matrices toegevoegd aan deze gewichten door
+middel van matrixdecompositie (Thiyagarajan, 2024). Deze techniek maakt het mogelijk om efficiënt en met relatief weinig data het model aan te passen. Figuur 2.4
+toont een voorbeeld van hoe deze matrixdecompositie werkt.
+LoRA is een veelbelovende techniek die in toekomstige onderzoeken gebruikt kan
+
+2.2. Data preprocessing
+
+15
+
+worden om de prestaties van de chatbot aanzienlijk te verbeteren. Vanwege beperkte beschikbare tijd en resources is deze techniek nog niet geïmplementeerd
+in de huidige proof of concept van deze thesis.
+
+Figuur 2.4: Afbeelding waar links pretrained model en rechts merged model is afgebeeld.
+
+2.2. Data preprocessing
+De data die gebruikt wordt, komt uit een SAP-systeem. Deze data bevat een boomstructuur van de installatie op verschillende levels binnen ArcelorMittal Gent. Dit
+betekent dat de data in een hiërarchische structuur is opgebouwd, waarbij de verschillende processen met elkaar verbonden zijn. Voor het ontcijferen van deze data
+zijn verschillende specialisten binnen ArcelorMittal gecontacteerd die ons hebben
+geholpen met het vertalen van de sleutel-waardeparen in de JSON. Er is echter een
+grote moeilijkheid bij de opsplitsing tussen locatie en machine. Doordat de dataset
+enorm groot is en er soms handmatige aanpassingen gebeuren door werknemers,
+kan het zijn dat de levels van de hiërarchie niet altijd correct zijn. Helaas kan er in
+dit onderzoek geen garantie worden gegeven door ArcelorMittal dat dit volledig
+klopt. Na een handmatige controle lijkt dit naar schatting voor 90% van de data te
+kloppen, maar bij uitgebreidere afdelingen kan dit verschillen. Dit betekent dat er
+voor verdere integratie een structurele aanpassing of opschoning van de dataset
+nodig is. Om de basis fundamenteel correct te houden, wordt er in de mock-data
+gewerkt met de volgende hiërarchie:
+• level 1: de locatie, bijvoorbeeld Gent.
+• level 2: de verschillende fabrieken.
+• level 3: de verschillende machines binnen een fabriek.
+• level 4: de verschillende motoren van een machine.
+
+16
+
+2. Stand van zaken
+
+2.2.1. JSON
+De ontvangen data is in JSON-formaat, een veelgebruikte indeling voor het opslaan
+van gestructureerde gegevens. JSON, of JavaScript Object Notation, is een tekstgebaseerde indeling die makkelijk te lezen en te schrijven is voor mensen en machines (Erickson, 2024). Doordat dit formaat zo flexibel is, wordt het vaak gebruikt bij
+web-, data- en softwareapplicaties. Hoewel JavaScript in de naam van JSON voorkomt, is het een taalonafhankelijk formaat dat ook in andere programmeertalen
+kan worden gebruikt. Aangezien wij gebruikmaken van JavaScript en Python, is
+dit een voordeel.
+JSON werkt op basis van sleutel-waardeparen, waarbij de sleutel een unieke naam
+is die aan een waarde is gekoppeld. De waarde kan elk type zijn, zoals een string,
+nummer, boolean of zelfs een ander JSON-object waarin nog sleutel-waardeparen
+staan. Hierdoor kan de data makkelijk gestructureerd en opgeslagen worden in
+een hiërarchische structuur. JSON-data is al een zeer goed gestructureerd formaat,
+maar voor onze toepassing moet deze data nog verder gestructureerd worden. Dit
+houdt in dat de verschillende JSON-objecten aan elkaar gelinkt moeten worden,
+zodat het grafiekmodel hieruit kan worden opgebouwd. Daarvoor wordt JSON-LD
+gebruikt, een uitbreiding van JSON die het mogelijk maakt om data te structureren
+en te annoteren met semantische betekenis. In codefragment 2.3 is een voorbeeld
+te zien van de mock-data die gebruikt wordt in deze thesis.
+1
+
+{
+”id”: ”1”,
+”name”: ”Machine 1”,
+”label”: ”machine 1”,
+”level”: 3,
+”parentId”: ”2”,
+”status”: ”In Use, Alarm”
+
+2
+3
+4
+5
+6
+7
+8
+
+}
+Codefragment 2.3: Voorbeeld van een JSON-object in de mock-data.
+
+2.2.2. JSON-LD
+JSON-LD staat voor JavaScript Object Notation for Linked Data. Dit is een uitbreiding van JSON die het mogelijk maakt om data te structureren en te annoteren (jsonld.org, z.d.). Het doel van deze Linked Data is om te zorgen dat je kunt beginnen
+bij één object en van daaruit de embedded links kunt volgen naar een ander object.
+Dit is vergelijkbaar met het grafiekmodel, waarbij er ook vanuit een knoop wordt
+vertrokken en er van daaruit verschillende relaties kunnen worden gevolgd. In samenwerking met schema.org en GS1 (standaardnormen voor traceringsdata) kan
+deze data correct gestructureerd, genormeerd en aan elkaar gelinkt worden. Het
+
+2.2. Data preprocessing
+
+17
+
+principe is hetzelfde, alleen wordt het model hier gecodeerd in een formaat dat
+makkelijk te lezen en te schrijven is voor mensen. Daarna kan deze JSON-LD direct
+worden ingelezen in Cosmos DB om deze links op te slaan en te visualiseren. Deze
+links zijn belangrijk, omdat er moet worden gevonden welke knopen aan elkaar
+verbonden zijn en welke dus invloed op elkaar hebben.
+In deze thesis zijn er twee verschillende JSON-LD-bestanden gebruikt, namelijk
+mock_data.jsonld en mock_data_EPCIS.jsonld. Dit omdat we op basis van de
+gewone mock-data de EPCIS-events bepalen, die later in de chatbot gebruikt worden.
+Via een JavaScript-script wat dezelfde code als codefragment 2.4 bevat, worden
+deze JSON-LD-bestanden omgezet naar een grafiekmodel. Eerst worden alle JSON
+sleutel-waardeparen omgezet naar de sleutel-waardeparen die nodig zijn voor JSONLD. Zo gebruiken we bij het type de juiste schema.org-types, zoals Place voor locaties en Product voor machines. Deze Place en Product types worden bepaald aan
+de hand van het level, zoals eerder besproken.
+Er bestaan ook andere formaten zoals PYLD (Python Linked Data), dotNetRDF (.NET
+Resource Description Framework), …. Doordat onze omgeving in JavaScript is opgebouwd en JSON-LD goed functioneert met Gremlin, is dit een goede keuze. Daarnaast zijn veel mensen bekend met JSON, waardoor implementatie en gebruik
+eenvoudiger zijn met enige technische kennis.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+const node = {
+”@id”: `am:${id}`,
+”@type”: level > 3 ? ”Product” : ”Place”,
+”name”: name,
+”label”: label ^| null,
+”containedInPlace”: parentId ? `am:${parentId}` : null,
+^^.cleanedItem,
+};
+nodes.push(node);
+};
+Codefragment 2.4: Voorbeeld van een JSON naar JSON-LD conversie.
+
+2.2.3. JSON-LD tot Graph
+Om onze JSON-LD om te zetten naar een grafiekmodel wordt gebruikgemaakt van
+JavaScript, waarbij de connectie wordt gemaakt zoals in 5.1 met onze Cosmos DB.
+Door het gebruik van deze JavaScript-code begint de conversie van JSON-LD naar
+een grafiekmodel. Mits een goede vertaling van JSON naar JSON-LD is dit een relatief eenvoudige taak. In figuur 2.5 is een voorbeeld te zien van hoe de JSON-LD
+wordt omgezet naar een Gremlin-query die de knoop toevoegt aan de database.
+
+18
+
+2. Stand van zaken
+
+Dit wordt gedaan voor elk JSON-LD-object dat wordt opgehaald uit de JSON-LDbestanden.
+In de JSON-LD staat ook de eigenschap label, die wordt gebruikt om de knoop te
+identificeren. Hiervoor is ervoor gekozen om het ID als label te gebruiken, dit is
+een unieke waarde die de knoop identificeert. Naast het label worden ook andere
+eigenschappen toegevoegd aan de knoop die relevant zijn, zoals de alarmstatus
+van de knoop.
+1
+2
+3
+4
+5
+6
+
+const gremlinQuery = `
+g.addV('${label}')
+.property('id', '${id}')
+.property('label', '${label}')
+${propertiesString}
+`;
+
+7
+8
+
+await client.submit(gremlinQuery);
+Codefragment 2.5: Voorbeeld van een JSON-LD naar Graph conversie.
+
+2.3. Datemodellering en structuur
+2.3.1. GS1
+GS1 is een wereldwijde organisatie die standaarden ontwikkelt voor identificatie,
+codering & uitwisseling (B. GS1 & Luxembourg, 2025). Deze standaarden helpen
+bedrijven om hun producten en diensten te identificeren, traceren en uit te wisselen. Elk product heeft een unieke identificatiecode, waardoor het mogelijk is het
+product te traceren doorheen de toeleveringsketen. GS1 heeft verschillende standaarden ontwikkeld, zoals de GTIN-code (Global Trade Item Number) en de GLNcode (Global Location Number). De GTIN-code is een code voor producten, elk product dat traceerbaar wil zijn, moet een GTIN-code hebben. Als de GTIN-code niet
+aanwezig is, kan het product niet worden geïdentificeerd en zal de fabrikant of leverancier deze moeten aanvragen bij GS1. Ook locaties kunnen een unieke code
+krijgen, namelijk de GLN-code. In volgende hoofdstukken wordt dieper ingegaan
+op de ontwikkeling van de GTIN- en GLN-codes, de rest van de GS1-standaarden
+zijn niet relevant voor dit onderzoek. Momenteel zijn er geen GTIN-codes aanwezig in de mock-data, maar deze kunnen later worden toegevoegd aan de knopen
+die producten zijn. Om deze codes te verkrijgen, moet er een aanvraag worden gedaan bij GS1, dit kan online via hun website. Voor het maken van het grafiekmodel
+met de chatbot is dit momenteel minder relevant. Als er wel GTIN- of GLN-codes
+aanwezig zijn in de data, kunnen deze toegevoegd worden als extra eigenschap of
+eventueel als label voor de knoop, aangezien deze ook uniek zijn.
+
+2.3. Datemodellering en structuur
+
+19
+
+GTIN
+De GTIN-code, ofwel het Global Trade Item Number, is een unieke identificatiecode die wordt gebruikt om producten te identificeren in de toeleveringsketen
+(GS1, 2025c). Deze bestaat uit 7 tot 14 cijfers en wordt benoemd als GTIN-8, GTIN-12,
+GTIN-13 of GTIN-14, de grootte van de code hangt af van de toepassing en het type
+product. Producten die klein zijn en weinig informatie bevatten, kunnen een GTIN8 hebben, terwijl grotere producten, zoals dozen of pallets, een GTIN-14 kunnen
+hebben. In de gezondheidszorg wordt vaak een GTIN-14 toegelaten, aangezien er
+ook veel informatie nodig kan zijn, bijvoorbeeld voor medicatie. De opbouw van de
+code is vrij simpel: de eerste 7 tot 14 cijfers identificeren het bedrijf, hoe korter deze
+prefix is, hoe meer producten er geïdentificeerd kunnen worden. Na deze code
+volgt de productcode, dit is ook een reeks unieke cijfers voor de identificatie van
+het product. Als laatste volgt het controlecijfer, een cijfer dat wordt berekend op
+basis van de andere cijfers in de code. Dit cijfer wordt gebruikt om te controleren of
+de code correct is ingevoerd en of er geen fouten zijn gemaakt bij het scannen van
+de code. Om een duidelijk voorbeeld te geven van deze GTIN-code is er in figuur 2.5
+een barcode te zien die een GTIN-12-code bevat.
+
+Figuur 2.5: GTIN-12 barcode.
+
+GLN
+De GLN-code, ofwel het Global Location Number, is een unieke identificatiecode
+die wordt gebruikt om locaties te identificeren in de toeleveringsketen (GS1, 2025b).
+Deze code is vergelijkbaar met de GTIN-code, maar wordt gebruikt voor locaties, de
+opbouw is ook gelijkaardig. De GLN-code moet sinds 1 juli 2022 uniek zijn en mag
+niet hergebruikt worden voor andere locaties. Eerst is er de bedrijfsprefix, daarna
+volgt het adresnummer en als laatste het controlecijfer. Dit controlecijfer wordt
+op dezelfde manier berekend als bij de GTIN-code. De bedrijfsprefix is een unieke
+code die wordt toegekend aan het bedrijf, deze code kan aangevraagd worden bij
+GS1. Het adresnummer is een unieke code die wordt toegekend aan de locatie, dit
+kan bijvoorbeeld een gebouw of een afdeling zijn.
+
+2.3.2. EPCIS-events
+Voor dit onderzoek wordt gebruikgemaakt van EPCIS (Electronic Product Code Information Services). Dit is een GS1-standaard die bedrijven in staat stelt om gebeurtenissen vast te leggen en te delen. Het biedt een gemeenschappelijk kader voor
+
+20
+
+2. Stand van zaken
+
+het vastleggen van het wat, wanneer, waar, waarom en hoe van gebeurtenissen
+die betrekking hebben op fysieke of digitale objecten. Deze waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in
+de toeleveringsketen (supply chain) vast te leggen en te delen binnen en buiten
+het bedrijf (Devins e.a., 2022). “Met behulp van deze waarden kunnen we real-life
+objecten omzetten in elektronisch opgeslagen informatie, waarna we dit kunnen
+communiceren met eindgebruikers, zegt Devins e.a. (2022).
+Door deze normen toe te passen, kan de traceerbaarheid van het product per proces gegarandeerd worden, inclusief de gewenste parameters die opgeslagen worden in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe), waar nodig.
+Voor het correct en volgens de normen opstellen van deze relaties bestaan er EPCISevents. Dit is een referentielijst waarin verschillende acties vooraf zijn bepaald. Hierin
+staan bijvoorbeeld acties zoals add, delete en update, die gebruikt worden om de
+data te structureren en relaties aan te maken (Byun & Kim, 2020). Met de actie add
+wordt er een relatie toegevoegd, bijvoorbeeld met het label IS_ASSOCIATED en de
+tijdstempel van wanneer de associatie is aangemaakt. Bijvoorbeeld, als er een machine is met een bepaalde motor, zullen de machine en de motor gekoppeld zijn
+met een EPCIS-event IS_ASSOCIATED die ook properties bevat zoals de tijdstempel
+van de associatie. Bij deze actie worden ook properties toegevoegd in een eventlijst, daar wordt bepaald om welk soort event het gaat en worden eventuele extra
+parameters toegevoegd voor de relatie, zoals de tijd van het event.
+In codefragment 2.6 is een voorbeeld te zien van een associatie-event tussen een
+machine en een component.
+De belangrijkste voordelen volgens GS1 (2025a) staan opgelijst in tabel 2.1.
+
+2.3. Datemodellering en structuur
+
+Voordeel
+
+Beschrijving
+
+Verbeterde zichtbaarheid
+
+Door het vastleggen en delen van gedetailleerde
+gebeurtenisgegevens kunnen bedrijven beter inzicht krijgen in de bewegingen en status van producten in de toeleveringsketen.
+
+Efficiëntieverbeteringen
+
+Door het automatiseren van gegevensverzameling en -uitwisseling kunnen bedrijven operationele efficiëntie verbeteren en fouten verminderen.
+
+Naleving van regelgeving
+
+EPCIS helpt bedrijven te voldoen aan wettelijke
+vereisten voor traceerbaarheid en rapportage.
+
+Betere samenwerking
+
+Door het delen van gebeurtenisgegevens met
+partners kunnen bedrijven beter samenwerken
+en de toeleveringsketen optimaliseren.
+
+21
+
+Tabel 2.1
+
+2.3.3. Schema.org
+Schema.org is een grote verzameling van gestructureerde data die entiteiten (knopen) en relaties kan weergeven (Douglas, Brickley e.a., 2023). GS1 en schema.org
+zijn complementair aan elkaar: GS1 richt zich op de identificatie en codering van
+producten, terwijl schema.org zich focust op de semantische betekenis van data. In
+dit project worden objecttypen uit schema.org gecombineerd met concepten van
+GS1 om onze data gestructureerd en semantisch rijk te modelleren. Met “semantisch rijk” wordt bedoeld dat de data meer betekenis krijgt. Zo wordt bijvoorbeeld
+de eigenschap containedInPlace van schema.org gebruikt om de relatie tussen
+een locatie en een asset te definiëren. Van GS1 worden de EPCIS-events gebruikt
+om acties te definiëren die uitgevoerd worden op de data, zoals het toevoegen of
+verwijderen van een relatie.
+Elke locatie krijgt een type, een label en extra properties, zoals een adres of een
+geografische locatie. Dit type of ID kan bijvoorbeeld Place zijn voor een locatie of
+Product voor een asset. Op de website van schema.org zijn alle mogelijkheden
+beschikbaar om data te structureren en te annoteren.
+In codefragment 2.6 is een voorbeeld te zien van een JSON-LD-bestand met gegevens volgens schema.org in het eerste JSON-object. In dit voorbeeld is Gent een
+locatie van het type Place met als label “Gent”. De ouderknoop of containedInPlace is null, aangezien Gent de hoofdlocatie is. Daarnaast is er te zien in het
+tweede JSON-object een EPCIS-document dat de associatie tussen twee fabrieken
+en Gent vastlegt. De parentID is de locatie Gent en de childEPCs zijn de twee fa-
+
+22
+
+2. Stand van zaken
+
+brieken die aan Gent zijn gekoppeld. Het event ADD geeft aan dat er een associatie
+is toegevoegd tussen de fabrieken en Gent. Het type associatie wordt bepaald door
+de eigenschap epcis:AssociationEvent.
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+28
+29
+30
+31
+32
+33
+34
+35
+36
+37
+
+{
+”@context”: {
+”schema”: ”https:^/schema.org”,
+”epcis”: ”https:^/ref.gs1.org/epcis/”,
+”cbv”: ”https:^/ref.gs1.org/cbv/”
+},
+”@graph”: [
+{
+”@id”: ”123”,
+”@type”: ”Place”,
+”name”: ”Gent”,
+”label”: ”Gent”,
+”schema:containedInPlace”: null,
+”KEY”: ”VALUE”
+},
+{
+”@type”: ”epcis:EPCISDocument”,
+”schemaVersion”: ”2.0”,
+”creationDate”: ”2025-03-19T17:40:54Z”,
+”epcis:EPCISBody”: {
+”epcis:EventList”: {
+”epcis:AssociationEvent”: {
+”eventTime”: ”2025-03-19T17:40:54Z”,
+”eventTimeZoneOffset”: ”+01:00”,
+”parentID”: [”Gent”],
+”childEPCs”: [
+”fabriek 1”,
+”fabriek 2”
+],
+”event”: ”ADD”,
+”disposition”: ”cbv:disp:active”
+}
+}
+}
+}
+]
+}
+
+Codefragment 2.6: Voorbeeld van een JSON-LD bestand met locatiegegevens.
+
+2.4. Chatbot
+De chatbot is een belangrijk onderdeel van ons project, aangezien het doorzoeken
+van de data zonder chatbot zeer tijdrovend en moeilijk is. Dit zou eventueel kunnen
+gebeuren door zelf handmatig Gremlin-query’s te schrijven, maar dit is niet efficiënt en vereist veel technische kennis van de gebruiker. De chatbot zal ons helpen
+om de data snel en efficiënt te doorzoeken en de juiste informatie te vinden.
+In deze thesis is de chatbot een REST-API die de vragen van de gebruiker kan beantwoorden op basis van de verzamelde data. Wat een REST-API is en hoe deze
+
+2.4. Chatbot
+
+23
+
+werkt, is al eerder besproken in sectie 2.1.4. Om de vragen te beantwoorden worden twee verschillende modellen gecombineerd, namelijk Phi-4 en CodeLLaMA.
+Zoals eerder besproken in sectie 2.1.6 is Phi-4 een large language model dat zeer
+goed is in het verwerken van natuurlijke taal en lichtgewicht is. Daarnaast is er ook
+CodeLLaMA, dit model is specifiek ontworpen voor het genereren van code en kan
+goed omgaan met de Gremlin-query’s. Om te zorgen dat de chatbot met beide
+modellen kan werken, zijn er een aantal stappen ondernomen.
+Eerst en vooral is de chatbot zelf in NodeJS opgezet, waarbij een runtime wordt
+aangemaakt die bereikbaar is via bijvoorbeeld Postman. Vervolgens wordt er via
+deze JavaScript-runtime een JSON-object met de vraag aangemaakt, zoals in codefragment 2.7 te zien is. Dit JSON-object (de vraag) wordt dan teruggestuurd naar
+JavaScript, die op zijn beurt een Python-script aanroept voor het genereren van een
+query. Er wordt gebruikgemaakt van Python omdat AI-modellen vaak beter ondersteund worden in Python en er veel bibliotheken beschikbaar zijn voor het werken
+met AI-modellen.
+1
+
+{
+”vraag”: ”Wat is de status van machine 1?”,
+
+2
+3
+
+}
+Codefragment 2.7: Voorbeeld van vraag in JSON.
+
+2.4.1. Retrieval Augmented Generation
+Om onze chatbot te optimaliseren wordt er gebruikgemaakt van RAG (Retrieval
+Augmented Generation). Dit is een techniek die het mogelijk maakt om de chatbot
+te laten leren van de data die is verzameld in ongestructureerde teksten, databases
+of andere bronnen (Zeichick, 2023). Hierdoor kan de chatbot beter begrijpen wat
+er van hem verwacht wordt en hoe hij de vragen moet beantwoorden zonder het
+model volledig te hertrainen. Dit is een low-level, maar veelgebruikte oplossing, die
+snel en flexibel bruikbaar is door documenten of context extra toe te voegen.
+Hierbij wordt een simpel tekstbestand met context aangemaakt, waarbij de nodige
+informatie wordt meegegeven, zoals wat de functie is van het AI-model en wat belangrijk is of niet. Daarnaast zijn er ook een aantal voorbeeldvragen en -antwoorden
+toegevoegd via een JSON-bestand, die geïndexeerd worden in een Elasticsearchcluster binnen de Docker-container, dit principe wordt besproken in 2.4.2. Dit is een
+belangrijke stap, omdat de chatbot hierdoor beter kan begrijpen wat er van hem
+verwacht wordt en hoe hij de vragen moet beantwoorden. Daarnaast is het belangrijk dat in de context wordt meegegeven dat hij geen tekst of codeblokken mag
+genereren, maar enkel en alleen de query mag teruggeven. Hiervoor is ook een
+veiligheidsmechanisme gecodeerd dat ervoor zorgt dat de query geen codeblok is
+zoals in markdown, door de backticks te verwijderen. Dit gebeurt door de query te
+
+24
+
+2. Stand van zaken
+
+filteren op backticks en alles voor en na deze backticks te verwijderen (voorbeeldcode in figuur 2.8). Doordat LLMs vaak codeblokken genereren in markdown, is dit
+een belangrijke, maar eenvoudige stap. Dit is een belangrijke stap aangezien deze
+query direct moet worden geïmplementeerd in de database, wat betekent dat als
+er overige tekst of karakters in staan, het genereren zal mislukken door syntaxfouten. Indien een query succesvol uitgevoerd is, wordt deze query ook opgeslagen
+in de JSON en toegevoegd aan de Elasticsearch-cluster. Het is ook belangrijk dat
+hij de JSON-resultset met items kan omzetten naar natuurlijke taal en begrijpt wat
+er wel of niet meegegeven mag worden. Als voorbeeld is het zo dat er in het antwoord soms databaseperformantiemetingen meegegeven worden die niet in het
+antwoord mogen staan voor de gebruiker.
+Door al deze “vereisten” als context mee te geven aan de chatbot, kan hij beter begrijpen wat er van hem verwacht wordt en hoe hij de vragen moet beantwoorden.
+1
+2
+
+query = query.replace(”gremlin”, ””).replace(”```”, ””).strip()
+^/ ```gremlin g.V().has('name', 'motor')``` ^^> g.V().has('name',
+↪
+'motor')
+Codefragment 2.8: Voorbeeld van het schoonmaken van de query.
+
+2.4.2. Elasticsearch
+Elasticsearch is een open-source zoek- en analysetool die gebruikt wordt om snel
+door grote hoeveelheden data te zoeken en deze te analyseren (Elastic, 2025). Het
+is gebouwd op Apache Lucene en werkt via een REST-API, waardoor het makkelijk
+te integreren is en tegelijk krachtig genoeg om schaalbaar met data om te gaan.
+Omdat Elasticsearch werkt met een gedistribueerde architectuur, kan het data en
+rekenkracht verdelen over meerdere servers. Dat zorgt voor betere prestaties en
+maakt het mogelijk om makkelijk op te schalen wanneer er meer data bijkomt.
+In deze thesis gebruik ik Elasticsearch om JSON-data rond Gremlin-query’s op te
+slaan in een index, zodat ik deze snel kan doorzoeken.
+Een groot voordeel van Elasticsearch is dat het data indexeert en opdeelt in tokens.
+Dat is handig bij het stellen van vragen, omdat het minder strikt kijkt naar de exacte
+volgorde van woorden van Oers (2025). Zo kunnen ook vragen die niet letterlijk in
+de dataset staan, maar er wel op lijken, toch goede resultaten opleveren.
+Naast tokenisatie maakt Elasticsearch ook gebruik van een omgekeerde index (inverted index). Dit is een datastructuur die het toelaat om supersnel op te zoeken
+welke documenten bepaalde termen bevatten (Brimley, 2023). In het volgende
+hoofdstuk leg ik dieper uit hoe tokenisatie en de omgekeerde index precies werken in Elasticsearch.
+Om een Gremlin-query te genereren, gebruik ik een aanpak die ik beschrijf als een
+hybride Elasticsearch-integratie. Meer uitleg daarover staat in sectie 2.4.2.
+
+2.4. Chatbot
+
+25
+
+Voor deze thesis gebruik ik de Elasticsearch Python-client in versie 8.12.0, omdat
+deze stabiel is en alles ondersteunt wat ik nodig heb. De eerste tests met versie 9.0
+gaven problemen, omdat er op dat moment nog geen Python-client beschikbaar
+was voor die versie.
+Tokenisatie
+Tokenisatie is het proces waarbij een tekst wordt opgesplitst in kleinere stukjes
+(meestal woorden) die vervolgens in een zogenaamde token stream terechtkomen (Elastic, z.d.). Zo’n token stream is eigenlijk gewoon een array met alle woorden uit de
+tekst, en deze wordt gebruikt om makkelijker te kunnen zoeken naar een passend
+antwoord.
+Zowel de vraag van de gebruiker als de bestaande vragen in de Elasticsearch-cluster
+worden op deze manier getokeniseerd. De vraag is dus wat de gebruiker intypt, en
+de cluster is de verzameling van alle eerder opgeslagen vragen in Elasticsearch.
+Door de tokens van de vraag en de tokens uit de cluster met elkaar te vergelijken,
+kan er bepaald worden hoe goed ze overeenkomen. Op basis daarvan (en met
+behulp van een ingestelde drempelwaarde (threshold)) kan er worden vastgesteld
+welke opgeslagen vraag het meest relevant is, en dus de beste match vormt. In
+figuur 2.9 is een voorbeeld te zien van hoe tokenisatie werkt in Elasticsearch.
+Omgekeerde index
+De omgekeerde index (of inverted index) is een lijst van alle tokens die in een vraag
+voorkomen. Deze tokens krijgen in de omgekeerde index één of meer ID’s toegewezen (Vatsya, 2024). Deze ID’s zijn unieke identificaties die verwijzen naar de vraag
+waarin de token voorkomt. Hierdoor wordt er enorm snel gezocht naar de juiste
+vraag en wordt deze teruggeven aan de gebruiker.
+De relevantiescore van een vraag wordt berekend op basis van TF (term frequency)
+en IDF (inverse document frequency). Dit betekent dat hoe vaker en hoe zeldzamer
+een token in een vraag is, hoe hoger de score zal zijn en dus hoe relevanter de vraag
+is.
+In fragment 2.9 is een voorbeeld te zien van een zin die is omgezet naar een omgekeerde index. Daar zal voor de vraag “Toon alle machines in Gent” gekozen worden voor de query die hoort bij “Geef alle machines in Gent”. Dit komt omdat de
+frequentie van de tokens “machines” en “Gent” in de vraag hoger is dan die van de
+andere tokens.
+
+26
+1
+
+2. Stand van zaken
+
+{
+Document 1: ”Geef alle machines in Gent”
+Document 2: ”Toon alle motoren in Antwerpen”
+
+2
+3
+4
+
+tokens: ['Geef', 'alle', 'machines', 'in', 'Gent', 'Toon',
+↪
+'motoren', 'Antwerpen']
+inverted index: {
+'Geef': [1],
+'alle': [1, 2],
+'machines': [1],
+'in': [1, 2],
+'Gent': [1],
+'Toon': [2],
+'motoren': [2],
+'Antwerpen': [2]
+}
+
+5
+
+6
+7
+8
+9
+10
+11
+12
+13
+14
+15
+16
+
+}
+Codefragment 2.9: Voorbeeld van een inverted index.
+
+Hybride Elasticsearch-integratie voor querygeneratie
+De integratie van alleen Elasticsearch is niet voldoende om de chatbot robuust te
+laten functioneren. Doordat Elasticsearch alleen de vragen indexeert en doorzoekt,
+is het niet in staat om de vragen te begrijpen en om te zetten naar Gremlin-query’s.
+Daarom wordt er gebruikgemaakt van een hybride integratie van Elasticsearch,
+waarbij de resultaten van Elasticsearch gebruikt worden om een query te laten genereren.
+Door de score van Elasticsearch te gebruiken, kan de chatbot bepalen welke vraag
+het meest relevant is voor de gestelde vraag. Als een vraag een score hoger dan 15
+heeft, wordt de bijbehorende query gebruikt om de data op te halen.
+Als de score hoger is dan 12, maar lager dan 15, wordt de vraag nog eens bekeken
+door het Large Language Model (CodeLLaMA) met de vorige best passende query
+(hoogste score). Door deze extra stap kan de chatbot mogelijke aanpassingen doen
+aan de query, waardoor hij beter in staat is om de juiste query te genereren. Met
+deze foutieve query en de context van het contextbestand kan de chatbot proberen
+om een nieuwe query te genereren die beter aansluit bij de vraag van de gebruiker.
+In figuur 5.2 is de workflow te zien van de hybride integratie van Elasticsearch voor
+querygeneratie. Daarnaast is er in codefragment 2.10 een voorbeeld te zien van de
+Elasticsearch-query die wordt gebruikt om de vragen te doorzoeken.
+
+2.4. Chatbot
+1
+2
+3
+4
+5
+6
+7
+8
+
+9
+10
+
+11
+
+27
+
+if response[”hits”][”hits”]:
+best_hit = response[”hits”][”hits”][0]
+score = best_hit[”_score”]
+if score >= 15:
+query = best_hit[”_source”][”antwoord”]
+return query
+else if score >= 12:
+previous_query = best_hit[”_source”][”antwoord”] # Sla de
+↪
+vorige query op
+if previous_query:
+query = generate_query_from_llm(question, context,
+↪
+previous_query, error)
+return query
+Codefragment 2.10: Voorbeeld van hoe we een Elasticsearch query bepalen.
+
+2.4.3. Docker
+Docker is een open-source platform dat het mogelijk maakt om applicaties te ontwikkelen en uit te voeren in containers (Combell, 2025). In deze thesis wordt Docker
+gebruikt om de verschillende componenten van de chatbot te isoleren en te beheren. Daarnaast zorgt Docker ervoor dat de omgeving van de applicatie consistent
+is, ongeacht waar deze wordt uitgevoerd. Hierdoor kan de applicatie eenvoudig
+worden geïmplementeerd en geschaald, zonder zorgen over de onderliggende infrastructuur.
+Docker maakt gebruik van images die in containers worden uitgevoerd. Elke image
+kan meerdere containers bevatten met hun eigen eigenschappen. Docker is ook
+sneller en performanter dan traditionele virtuele machines, omdat het geen volledige besturingssystemen hoeft te emuleren. Met behulp van Docker kan de chatbot eenvoudig worden geïmplementeerd en laten communiceren met andere componenten, zoals de Ollama-modellen en Elasticsearch.
+Docker images
+Docker-images vormen de basis van Docker-containers en bevatten alles wat nodig is om de applicatie uit te voeren (Schmitt, 2024). Voor deze thesis is er een
+Dockerfile opgesteld die de basisimage bevat en de benodigde dependencies installeert. In figuur 5.3 is een voorbeeld te zien van de Dockerfile voor NodeJS die
+wordt gebruikt om de chatbot te bouwen.
+Docker containers
+Docker-containers zijn geïsoleerde processen die gebaseerd zijn op een Dockerimage, zonder effect op andere delen van het systeem Schmitt (2024). Zo is er
+
+28
+
+2. Stand van zaken
+
+bijvoorbeeld een container voor de chatbot, een container voor Elasticsearch en
+een container voor de Ollama-modellen, die eenvoudig via een API kunnen worden aangeroepen en onderling kunnen communiceren.
+Docker-compose
+Om alle containers in één keer op te starten en te beheren, wordt gebruikgemaakt
+van Docker Compose (Combell, 2025). In figuur 5.2 is een voorbeeld te zien van
+een Docker Compose-bestand dat gebruikt is om de verschillende containers op
+te starten. Het gebruik van Docker Compose is vooral geschikt op kleine schaal.
+Voor schaalvergroting naar een productieomgeving kan Kubernetes worden ingezet. Kubernetes zorgt ervoor dat containers automatisch worden geschaald en beheerd.
+
+3
+Methodologie
+3.1. Dataverwerking
+3.1.1. Technologieën voor databases
+In het eerste deel van deze bachelorproef wordt een literatuurstudie uitgevoerd
+over de verschillende technologieën die worden gebruikt om data op te slaan en
+te verwerken. De werking en efficiëntie van Cosmos DB zijn onderzocht, evenals
+de werking van de Gremlin API en de toepassing ervan bij het opzetten van een
+grafiekmodel. De ontvangen data is vrij complex en betreft een boomstructuur uit
+SAP, aangeleverd via een JSON-bestand. Het lastigste aan deze data is de interpretatie van de verschillende sleutel-waardeparen en de hiërarchie, die niet volledig
+klopt, waardoor de juiste verdeling tussen afdeling en machine moeilijk vast te stellen was. Elke sleutel heeft een specifieke betekenis en waarde die vertaald moet
+worden naar een leesbare vorm voor het grafiekmodel. Na het verwerken, begrijpen en opschonen van de data is deze omgezet naar JSON-LD-formaat volgens de
+GS1-standaarden. Vanaf dat moment is de data klaar om te worden ingeladen in
+Cosmos DB. Met behulp van Python en JavaScript kunnen grote delen van het proces geautomatiseerd worden, wat zorgt voor een snellere en efficiëntere werkwijze.
+
+3.2. Proof of concept
+3.2.1. Opzetten van een grafiekmodel
+In het tweede deel van deze bachelorproef wordt een proof of concept opgesteld
+van het grafiekmodel waarbij de SAP-data van ArcelorMittal Gent wordt gebruikt.
+Zoals eerder vermeld, is de JSON-data omgezet naar GS1-standaarden in een JSONLD-bestand. Dit bestand, opgemaakt met schema.org en GS1 EPCIS-events, wordt
+ingeladen in Cosmos DB via NodeJS en de Gremlin API. Hierdoor ontstaat een grafiekmodel waarin de data gevisualiseerd en geanalyseerd kan worden aan de hand
+29
+
+30
+
+3. Methodologie
+
+van de relaties tussen de verschillende producten en processen. Dit grafiekmodel
+kan worden gevisualiseerd met behulp van Graph Explorer, dat ingebouwd is in
+Azure Cosmos DB, of met andere visualisatietools. In figuur 5.2 is een voorbeeld te
+zien van de werking van de chatbot. In het eerste deel van de figuur wordt getoond
+wat er moet gebeuren met de data als deze nog niet in JSON-LD-formaat is. In het
+tweede deel wordt weergegeven hoe de chatbot van een vraag tot een antwoord
+komt.
+
+3.2.2. Opzetten van een chatbot
+In het derde deel van deze bachelorproef wordt een chatbot opgesteld die de data
+van het grafiekmodel kan bevragen en analyseren. De input van dit model is een
+vraag van de gebruiker; deze wordt vertaald naar een Gremlin-query die de data in
+Cosmos DB beantwoordt. De query zoekt vervolgens de relevante knopen en relaties, die verwerkt en geformatteerd worden tot leesbare tekst. De chatbot werkt
+iteratief: in de eerste stap wordt de query gemaakt, in de tweede stap worden de
+resultaten teruggegeven aan de gebruiker. Tijdens dit proces wordt gebruikgemaakt van een Retrieval Augmented Generation (RAG)-model dat de resultaten
+van de Gremlin-query kan verwerken en formatteren naar leesbare tekst. Er zijn
+twee methoden om een query op te halen. De eerste methode maakt gebruik
+van Elasticsearch, dat in een Docker-container draait. Hiervoor wordt een JSONbestand met voorbeeldvragen gebruikt, geïndexeerd in een database, om sneller
+en nauwkeuriger de juiste query te vinden. De tweede methode maakt gebruik
+van een Large Language Model (LLM) wanneer er geen bijpassende query in Elasticsearch gevonden wordt. Daarnaast wordt de query die van het LLM terugkomt
+gevalideerd, zodat deze uitvoerbaar is in Cosmos DB.
+Docker wordt ingezet om de verschillende componenten van de chatbot te beheren en te laten communiceren. Hierdoor kan de chatbot eenvoudig worden opgezet en beheerd, zonder zorgen over de onderliggende infrastructuur. In figuur 3.1
+is een voorbeeld te zien van de output van de chatbot.
+
+3.2. Proof of concept
+
+31
+
+Figuur 3.1: Voorbeeld van output op basis van Cosmos DB.
+
+3.2.3. Structuur chatbot
+Voor de chatbot wordt er gebruik gemaakt van CodeLlama voor het genereren van
+een Gremlin-query en een Phi4-model voor het samenvatten van data uit de database. Deze modellen worden via Ollama in een Docker-container gebruikt, zodat
+er een lokale versie kan draaien die niet verbonden is met het internet. Dit wordt
+gedaan omdat er zekerheid moet zijn dat het model geen data via het internet opslaat, bijvoorbeeld om het eigen model verder te trainen. Een voorbeeld van een
+model dat zichzelf traint is OpenAI, dat getraind is op een grote dataset waarbij
+deze data ook wordt gebruikt om het model te verbeteren. Dit is niet de bedoeling
+voor ons model, omdat er zeker geen datalek mag worden veroorzaakt. Met de
+chatbot kunnen vragen beantwoord worden die gerelateerd zijn aan het productieproces van ArcelorMittal Gent, zoals: “Welke fabrieken staan er in Gent?” of “Geef
+alle kranen met een melding op de motor”. Dit probleem wordt opgelost met het
+iteratieve proces binnen onze chatbot, waarbij de vraag wordt doorgegeven aan de
+chatbot om beantwoord te worden.
+
+4
+Conclusie
+In deze bachelorproef is onderzocht hoe een combinatie van een grafiekmodel en
+een Large Language Model (LLM) kan worden ingezet om gegevens binnen het
+staalverwerkingsproces van ArcelorMittal Gent efficiënt op te vragen. Het doel was
+een proof of concept te ontwikkelen die niet alleen de traceerbaarheid van productieprocessen verbetert, maar ook de operationele efficiëntie verhoogt door middel
+van een chatbot die procesvragen kan beantwoorden. Door de SAP-boomstructuur
+om te zetten naar JSON-LD-formaat volgens GS1-standaarden en deze te structureren in een grafiekdatabase (Cosmos DB), werd een stevige basis gelegd voor het
+traceren van productieprocessen. Vervolgens werd een chatbot ontwikkeld die gebruikmaakt van Gremlin-queries en Retrieval Augmented Generation (RAG) om
+procesvragen te vertalen naar begrijpelijke antwoorden. Met modellen zoals Code
+Llama voor querygeneratie en Phi-4 voor natuurlijke taalverwerking is een performante oplossing opgezet die uitbreidbaar is en bruikbaar voor andere use-cases
+binnen de industrie.
+In dit onderzoek is vooral gezocht naar combinaties van technieken die de traceerbaarheid van productieprocessen verbeteren. De ontwikkelde proof of concept
+toont aan dat het mogelijk is een chatbot te creëren die vragen kan beantwoorden over productieprocessen door gebruik te maken van dit grafiekmodel en een
+LLM. Met de juiste finetuning en eventuele hertraining van de modellen kan deze
+oplossing verder worden uitgebreid en geoptimaliseerd voor andere toepassingen
+binnen de industrie. Naast de technische aspecten is het belangrijk de gebruikerservaring mee te nemen. De chatbot functioneert als een API die geïntegreerd kan
+worden in bestaande systemen, waardoor gebruikers eenvoudig toegang krijgen
+tot de benodigde informatie. De proof of concept biedt een solide basis voor verdere ontwikkeling en implementatie binnen ArcelorMittal Gent en mogelijk ook
+andere bedrijven in de staalindustrie.
+
+32
+
+4.1. Resultaten
+
+33
+
+4.1. Resultaten
+De resultaten van dit eerste onderzoek zijn veelbelovend. Er is aangetoond dat
+het mogelijk is om een grafiekmodel op te zetten met behulp van Cosmos DB
+en de Gremlin API, en dat dit model kan worden gebruikt om data te visualiseren en te analyseren. Daarnaast is een proof of concept ontwikkeld van een chatbot die vragen kan beantwoorden over het productieproces van ArcelorMittal Gent.
+Een belangrijk knelpunt is dat het CodeLlama-model niet altijd de juiste Gremlinquery genereert, waardoor handmatig queries toegevoegd moeten worden aan
+het JSON-bestand voor Elasticsearch. Dit kan opgelost worden door het model
+verder te trainen met LoRA (zoals besproken in hoofdstuk 2.1.7), maar vanwege beperkte tijd en resources is dit niet uitgevoerd in deze bachelorproef.
+In de volgende demo video is een korte demonstratie te zien van de chatbot en
+hoe deze werkt met de data die in Cosmos DB is opgezet. Aan het begin heeft het
+Ollama-model tijd nodig om een vraag te beantwoorden, omdat Ollama standby
+staat maar het model nog niet geladen is. Pas zodra de vraag wordt gesteld, wordt
+het model geladen en kan de chatbot de vraag beantwoorden. Bij een tweede
+vraag verloopt dit veel sneller, omdat het model dan al geladen is en de chatbot
+direct kan antwoorden. In figuur 5.1 is een screenshot te zien van de demo video.
+
+4.1.1. Voordelen
+De voordelen van het gebruik van een tijdelijk grafiekmodel zijn onder andere:
+• Het is mogelijk om data te visualiseren en analyseren door de relaties tussen
+de verschillende producten en processen.
+• Het is mogelijk om snel vragen van gebruikers te beantwoorden over het productieproces van ArcelorMittal Gent.
+• Verhoogde traceerbaarheid van productieprocessen, waardoor het eenvoudiger wordt om problemen te identificeren en op te lossen.
+• Het is mogelijk om de chatbot eenvoudig op te zetten en te beheren, zonder
+zorgen over de onderliggende infrastructuur.
+• Door gebruik te maken van Elasticsearch kan er sneller een antwoord geven
+op meest gestelde vragen, waardoor de chatbot sneller en efficiënter wordt.
+
+4.1.2. Nadelen
+De nadelen of problemen die ondervonden zijn bij de huidige werkwijze zijn onder
+andere:
+• Het CodeLlama model genereert niet altijd de juiste Gremlin query, waardoor
+ze handmatig moeten worden toegevoegd aan het JSON bestand voor Elasticsearch.
+
+34
+
+4. Conclusie
+• De snelheid van de chatbot is afhankelijk van Ollama die een antwoord of
+query moet genereren, waardoor het soms langer duurt om een antwoord
+te krijgen indien de query niet in Elasticsearch aanwezig is.
+
+4.2. Toekomstig onderzoek
+Om de chatbot verder uit te breiden en te verbeteren, kunnen verschillende zaken worden aangepakt. Allereerst kan gekeken worden naar het finetunen van
+het CodeLlama-model met LoRA, zoals besproken in 2.1.7, om de kwaliteit van de
+gegenereerde Gremlin-queries te verbeteren. Daarnaast kunnen er nog meer prestatieoptimalisaties worden doorgevoerd om de snelheid van de chatbot te verhogen. Ook kunnen rechten worden toegevoegd, zodat bepaalde gebruikersgroepen
+alleen specifieke vragen kunnen stellen of antwoorden kunnen ontvangen. Daarnaast kunnen deze rechten worden gebruikt om DELETE-, ADD- en UPDATE-acties
+toe te voegen, waardoor de chatbot multifunctioneel wordt.
+
+5
+Bijlagen
+
+35
+
+36
+
+5. Bijlagen
+
+5.1. Verbinden met Cosmos DB via Gremlin API
+1
+2
+
+const Gremlin = require('gremlin');
+const config = require('^./config/config');
+
+3
+4
+
+let client;
+
+5
+6
+7
+8
+
+9
+
+10
+11
+12
+13
+14
+15
+16
+17
+18
+19
+20
+21
+22
+
+function getClient() {
+if (!client) {
+const authenticator = new
+↪
+Gremlin.driver.auth.PlainTextSaslAuthenticator(
+`/dbs/${config.database}/colls/${config.collection}`,
+↪
+config.primaryKey
+);
+client = new Gremlin.driver.Client(
+config.endpoint,
+{
+authenticator,
+traversalsource: 'g',
+rejectUnauthorized: true,
+mimeType: 'application/vnd.gremlin-v2.0+json'
+}
+);
+}
+return client;
+}
+
+23
+24
+
+module.exports = { getClient };
+Codefragment 5.1: Voorbeeld van hoe we verbinding maken met CosmosDB via Gremlin API.
+
+5.2. Voorbeeld Docker-compose bestand
+
+5.2. Voorbeeld Docker-compose bestand
+1
+2
+3
+4
+5
+6
+7
+8
+9
+10
+
+version: '3.8'
+services:
+elasticsearch:
+image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+container_name: elasticsearch
+environment:
+- discovery.type=single-node
+- ES_JAVA_OPTS=-Xms512m -Xmx512m
+- xpack.security.enabled=false
+- network.host=0.0.0.0
+
+11
+12
+13
+14
+
+volumes:
+- es_data:/usr/share/elasticsearch/data
+
+15
+16
+17
+18
+19
+20
+21
+22
+23
+24
+25
+26
+27
+
+chatbot:
+build:
+context: ^./^.
+dockerfile: scripts/docker/Dockerfile.chatbot
+container_name: chatbot
+command: [”node”, ”scripts/chatbotPy.js”]
+volumes:
+- ^./^.:/app
+depends_on:
+- elasticsearch
+ports:
+- ”3000:3000”
+
+28
+29
+30
+31
+
+ollama:
+container_name: ollama
+image: ollama/ollama:latest
+
+32
+33
+34
+35
+36
+37
+
+volumes:
+- ollama_models:/root/.ollama
+restart: unless-stopped
+environment:
+- OLLAMA_HOST=0.0.0.0
+
+38
+39
+40
+41
+42
+
+volumes:
+es_data:
+driver: local
+ollama_models:
+Codefragment 5.2: Voorbeeld van een Docker-compose bestand.
+
+37
+
+38
+
+5. Bijlagen
+
+5.3. Voorbeeld Dockerfile voor NodeJS en Python
+1
+2
+3
+
+# Basis image
+# We gebruiken hier NodeJS versie 20
+FROM node:20
+
+4
+5
+6
+
+# Bepalen van de werkdirectory (waar alle bestanden komen)
+WORKDIR /app
+
+7
+8
+9
+10
+
+# installeren van NodeJS packages
+COPY package*.json ./
+RUN npm install
+
+11
+12
+13
+14
+
+# Kopieer de requirements.txt naar de container
+# Dit is een tekstbestand met de Python packages die we nodig hebben
+COPY requirements.txt ./
+
+15
+16
+17
+
+# Kopieer alle bestanden naar de container
+COPY . .
+
+18
+19
+20
+
+# Commando om Python te installeren
+RUN apt-get update ^& apt-get install -y python3 python3-pip
+
+21
+22
+23
+
+# Dependencies installeren die nodig zijn voor de chatbot
+RUN pip3 install --no-cache-dir -r requirements.txt
+
+24
+25
+26
+
+# Starten van de Node.js applicatie
+CMD [”node”, ”scripts/chatbotPy.js”]
+Codefragment 5.3: Voorbeeld van een Dockerfile.
+
+5.4. Screenshot van de demo video
+
+5.4. Screenshot van de demo video
+
+Figuur 5.1: Screenshot van de demo video.
+
+5.5. Workflow van de chatbot
+
+Figuur 5.2: Workflow van de chatbot, van vraag tot antwoord.
+
+39
+
+A
+Onderzoeksvoorstel
+Het onderwerp van deze bachelorproef is gebaseerd op een onderzoeksvoorstel
+dat vooraf werd beoordeeld door de promotor. Dat voorstel is opgenomen in deze
+bijlage.
+
+Samenvatting
+In deze bachelorproef wordt onderzocht hoe grafiekmodellering kan bijdragen aan
+efficiënte klachtenafhandeling binnen bedrijfsprocessen. Door gebruik te maken
+van een Large Language Model (LLM) gekoppeld aan een chatbot willen worden
+bedrijven in staat gesteld sneller en nauwkeuriger de oorzaken van problemen te
+achterhalen, waardoor kostbaar handmatig werk wordt verminderd. Dit door een
+vraag te stellen aan de chatbot waarbij hij via het grafiekmodel een ongewone gebeurtenis kan ophalen. Het onderzoek richt zich op twee fases: de omzetting van
+EPCIS-events naar een grafiekmodel in Cosmos DB met behulp van de Gremlin API,
+en het trainen van een LLM om te analyseren waar, wanneer, wat en hoe gebeurtenissen plaatsvinden. Dit proces helpt bij het opsporen van anomalieën, met als
+doel schaalbare en performante oplossingen te bieden voor bedrijfs- en nationale
+use cases. Uiteindelijk wordt er gestreefd naar het optimaliseren van klantenervaring en operationele efficiëntie.
+
+A.1. Inleiding
+Voor deze bachelorproef werk ik samen met Tracked, een compentence center binnen de Cronos groep gespecialiseerd in traceerbaarheid van de toeleveringsketen
+in de industrie, en gaan we aan de slag met traceringsdata van ArcelorMittal Gent.
+Binnen ArcelorMittal Gent bestaan er veel verschillende processen die verspreid
+zijn over meerdere afdelingen. Hierbij bevat elke afdeling een deel van het proces om van grondstof tot een afgewerkt product te komen. Tussen elke afdeling
+40
+
+A.2. Literatuurstudie
+
+41
+
+bevindt zich een deel van de toeleveringsketen, waarbij het resultaat van de ene
+afdeling het beginpunt is voor de volgende afdeling. Dit zorgt ervoor dat iedere
+stap zijn invloed heeft op de kwaliteit van het eindresultaat.
+Elke afdeling is opgebouwd rond een specifiek proces, zoals de hoogoven die ruwe
+grondstoffen omzet in ruw ijzer en de staalfabriek die ruw ijzer in staal verandert.
+Omdat deze afdelingen zeer specifieke processen hebben, hebben ze ook zeer specifieke behoeften en datamodellen. Dit maakt analyse of onderzoek over afdelingen heen zeer complex en tijdsrovend.
+De scope van deze bachelorproef is tweedelig, waarbij deel één eruit bestaat om samen met Tracked vanuit een gestandariseerd datamodel die zichtbaarheid events
+bijhoudt om te zetten naar een grafiekmodel. Deel twee bouwt verder voort op dit
+grafiekmodel om dan een LLM (large language model) te trainen die eenvoudig
+informatie eruit kan halen en teruggeven.
+De centrale vraag die hier gesteld wordt is: “Hoe we efficiënt en snel grafiekmodellering kunnen toepassen om een LLM te ontwikkelen die in staat is om het waar,
+wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten.“
+
+A.2. Literatuurstudie
+A.2.1. Cosmos DB
+Cosmos DB is een NoSQLdatabase van Microsoft. Het biedt een lage latentie, multiquery-API die eenvoudig grote hoeveelheden data kan verwerken en heeft een
+grote beschikbaarheid zegt van der Put (2020), wat zeer belangrijk is in ons project.
+Daarnaast is CosmosDB horizontaal schaalbaar, wat betekent dat we op hoogtepunten tot een miljoen lees- en schrijfaanvragen kunnen verwerken door het benodigde aantal servers toe te voegen. De hoge beschikbaarheid wordt gegarandeerd
+door replicatie, waardoor we snel kunnen overschakelen als er een probleem is in
+onze database.
+
+A.2.2. Grafiek modellering
+In een grafiekdatabase slaan we gegevens op in de vorm van vertices (knopen) en
+edges (relaties), hierdoor kunnen we complexe verbanden leggen zoals in ons geval
+de productieprocessen. Cosmos DB ondersteunt ook grafiekmodellering met behulp van Gremlin API. Gremlin is gebasseerd op Apache tinkerpop’s Gremlin, dit is
+een krachtig grafiekverwerkingsframework waarbij we grote grafieken kunnen opslaan, modelleren en doorzoeken via gremlin traversal language (Microsoft, 2024c).
+Dit gebeurt met een snelheid van milliseconden waardoor we een snelle verwerkingstijd zullen kunnen neerzetten. Daarnaast is Gremlin ook schaalbaar en kan
+het consistentie level gekozen worden om een balans te vinden tussen consistentie, beschikbaarheid en latentie. Binnen zo’n grafiek model hebben we vertices (of
+
+42
+
+A. Onderzoeksvoorstel
+
+nodes) die een persoon, plaats of event beschrijven zoals in ons geval bijvoorbeeld
+een slab die wordt verplaatst van A naar B.
+Verschil transformatie en aggregatie
+Binnen ons project kunnen de bestaansvormen van producten veranderen. Zo
+hebben we transformatie, dit is een deel van het proces waarbij de verandering
+van het product onomkeerbaar is. Daarnaast hebben we aggregatie waarbij we
+wel terug naar de oorspronkelijke vorm zouden kunnen gaan indien nodig. In onze
+grafiekmodellering moeten we gebruik maken van tijdelijke edges om ook terug
+te kunnen kijken naar wat voor het transformatie- of aggregatieproces gebeurd is,
+om zo anomalieën terug te vinden (Jaewook Byun, 2020).
+
+A.2.3. Retrieval Augmented Generation
+Om onze chatbot te optimaliseren gaan we gebruik maken van RAG. Dit zorgt ervoor dat de antwoorden die de chatbot zal geven niet out-dated zijn en een geldige
+bron bevatten (zoals onze eigen data) (IBM, 2023). Binnen een LLM waarbij je RAG
+gebruikt zal de user een prompt geven, daarna gaat het LLM vragen aan RAG om
+alle bronnen (data) te geven over het gevraagde onderwerp. Zodra hij jouw prompt
+samen heeft gevoegd met de data die erover beschikbaar is geeft hij een correct
+antwoord terug. In ons geval kunnen we bijvoorbeeld vragen waar de container
+staal was op een bepaalde datum, en op dat moment vraagt het LLM aan RAG alle
+informatie over die container waarna hij een geschikt antwoord kan geven. Deze
+methode wordt ook gebruikt in onder andere ChatGPT en andere LLM’s om ervoor
+te zorgen dat je het model zelf niet herhaaldelijk moet trainen, maar een up-todate dataset aan koppelt. Kort gezegd is RAG een AI framework dat data gebruikt
+buiten zijn eigen getrainde data om te voorkomen dat je het model moet blijven
+updaten.
+RAG vs Finetuning
+Bij RAG gebruiken we een soort database waarbij het model up-to-date blijft en geldige bronnen gebruikt. Dit is voordelig in ons project omdat er dagelijks heel veel
+staal geproduceerd wordt en dus veel verschillende processen zijn. Daarnaast hebben we finetuning waarbij we onze eigen stijl kunnen geven aan het model door
+bepaalde vakjargon toe te voegen of het model sneller te maken (IBM, 2024). Maar
+er moet wel zorgvuldig met finetuning omgegaan worden, want het kan snel veel
+rekenkracht vragen of zelfs voor overfitting zorgen waarbij de trainingsdata goed
+presteert, maar ongeziene data niet zegt EASIIO (2022). Een combinatie van deze
+2 methodes zou in ons scenario ideaal zijn. Dit komt doordat ArcelorMittal veel
+vakjargon hanteert, zoals cokes en slabs. Hierdoor kunnen we ons model specialiseren. Daarnaast moet de data die we gebruiken specifiek en up-to-date zijn, zodat
+we altijd van elk moment op de hoogte blijven
+
+A.2. Literatuurstudie
+
+43
+
+A.2.4. EPCIS
+Voor dit onderzoek moet alles voldoen aan de EPCIS (Electronic Product Code Information Services) waarden, dit zijn de wat, wanneer, waar, waarom en hoe. Deze
+waarden zijn ontwikkeld door GS1 om gegevens over beweging, status en verandering van een item in de toeleveringsketen (supply chain) vast te leggen en te
+delen binnen en buiten het bedrijf (Devins e.a., 2022). “Met behulp van deze waarden kunnen we real-life objecten omzetten in elektronisch opgeslagen informatie,
+waarna we dit kunnen communiceren met eindgebruikers.“ zegt Devins e.a. (2022).
+Door deze normen toe te passen kunnen we de traceerbaarheid van het product
+per proces garanderen inclusief de gewenste parameters die opgeslagen worden
+in ons grafiekmodel zoals tijd (wanneer) en temperatuur (hoe) waar nodig.
+Waarom EPCIS?
+Huidige Legacy Systemen maken gebruik van ERP, POS, WMS,…Vaak lopen deze
+niet real-time wat nadelig is als we direct iets willen weten over een product en
+hoge beschikbaarheid verwachten (Vieweger, z.d.). Doordat elk bedrijf eenzelfde
+norm gebruikt kunnen we dit schaalbaar houden en makkelijk uitbereiden.
+
+44
+
+A. Onderzoeksvoorstel
+
+A.3. Methodologie
+Eerst en vooral gaan we aan de slag met een json bestand dat data bevat van ArcelorMittal waar events in opgeslagen staan. Daarna zetten we dit om naar Cosmos
+DB (de door Tracked gebruikte database service) en kunnen we via Gremlin API
+werken om een grafiek op te zetten met tijdsgebonden edges. Dit dient ervoor om
+te zorgen dat we in tijd terug kunnen om de historiek op te vragen en te kijken
+waar, wanneer en hoe een proces gebeurd is. Daardoor kunnen we achteraf bij onder andere klachtenafhandeling terug kijken in het grafiekmodel wat er mogelijks
+anders was of fout is gelopen.
+Dit grafiekmodel moet ook voldoen aan de normen volgens EPCIS en schaalbaar
+zijn, daarom gaan we zorgen dat de gebruikte data binnen het grafiekmodel zoals
+een node een id krijgt in de plaats van een statische naam. Daardoor kan Tracked
+in latere fases of andere business cases dezelfde technieken gebruiken zonder veel
+aanpassingen te moeten doen op grote schaal.
+Zodra we een duidelijk grafiekmodel hebben waarmee we makkelijk in het verleden kunnen kijken, kunnen we dit trainen met copilot van microsoft. Daarna gaan
+we op zoek naar de beste methode om dit te implementeren met onder andere
+hulp van de RAG methode en finetuning. Daarnaast gaan we ook nog op zoek
+naar een geschikt zoekalgoritme om zo snel mogelijk op de juiste data terecht te
+komen. Daardoor kunnen we dan snel zoeken naar waar mogelijks anomalieën
+zijn in een proces door te vergelijken met andere batches die hetzelfde proces hebben doorlopen. Als laatste kunnen we dan via copilot makkelijk een implementatie
+starten voor onder andere Microsoft Teams waarbij iemand van de klantenservice
+kan vragen wat er fout is gelopen en dat de chatbot zegt waar, wanneer en hoe er
+mogelijks een fout is geweest in het proces.
+
+A.4. Verwacht resultaat, conclusie
+In dit onderzoek maken we startlaag aan een groter project waarbij het mogelijk
+is om uit te bereiden naar bijvoorbeeld een planningstool om de meest efficiënte
+route te zoeken. Door deze chatbot verwachten we dat medewerkers van ArcelorMittal eenvoudig een vraag kan stellen en een antwoord kan krijgen op een korte
+tijd. Zonder deze optie moeten ze elk deel van het bedrijf handmatig opbellen en
+vragen wat er gebeurd is, dat zijn zaken die zeer tijdsslopend zijn en veel geld kosten. Er wordt gehoopt dat we een schaalbaar systeem kunnen opstellen en dit
+performant kunnen houden waardoor het gebruikt kan worden op nationaal en/of
+internationaal niveau. Met de implementatie van dit systeem wordt er gestreefd
+naar de optimalisatie van klanttevredenheid en besparingen binnen een bedrijf, in
+dit geval ArcelorMittal Gent.
+
+A.4. Verwacht resultaat, conclusie
+
+Figuur A.1: Flowchart
+
+45
+
+Bibliografie
+Altexsoft, E. T. (2022, november 8). About NodeJS. https://www.altexsoft.com/blog/
+the-good-and-the-bad-of-node-js-web-app-development/
+Azure. (2024, augustus 22). What is Azure Cosmos DB for Apache Gremlin? https:
+//learn.microsoft.com/en-us/azure/cosmos-db/gremlin/introduction
+Azure, M. (z.d.). Prijzen voor Azure Cosmos DB. Verkregen mei 30, 2025, van https://
+azure.microsoft.com/nl-nl/pricing/details/cosmos-db/autoscale-provisioned/
+Brimley, D. (2023, juli 17). What is an Elasticsearch index? https://www.elastic.co/
+blog/what-is-an-elasticsearch-index
+Brown, M., Andrews, S., e.a. (2024). Request Units in Azure Cosmos DB. Azure Cosmos DB. https://learn.microsoft.com/en-us/azure/cosmos-db/request-units
+Byun, J., & Kim, D. (2020). Object traceability graph: Applying temporal graph traversals forefficient object traceability. Expert Systems With Applications.
+Cloudflare. (z.d.). What is lora? https://www.cloudflare.com/learning/ai/what- islora/
+Combell. (z.d.). Wat is HTTP? https://www.combell.com/nl/technologie/http
+Combell. (2025, januari 6). Wat is Docker en waarom wil je ermee werken? https:
+//www.combell.com/nl/blog/wat-is-docker/
+Devins, C., e.a. (2022, juni). EPCIS standard. Verkregen november 13, 2024, van https:
+//ref.gs1.org/standards/epcis/
+Douglas, J., Brickley, D., e.a. (2023, november 22). About schema.org (V28.1). https:
+//schema.org/docs/about.html
+EASIIO. (2022). LLM De kracht van grote taalmodellen ontketenen. https://www.
+easiio.com/nl/fine-tune-llm/
+Elastic. (z.d.). Tokenizer reference. https : / / www . elastic . co / docs / reference / text analysis/tokenizer-reference
+Elastic. (2025). The heart of the Elastic Stack. https://www.elastic.co/elasticsearch
+Erickson, J. (2024, april 4). What Is JSON? Oracle. https : / / www . oracle . com / nl /
+database/what-is-json/
+GS1. (2025a). EPCIS & CBV Standards. Verkregen maart 3, 2025, van https://www.gs1.
+org/standards/epcis
+GS1. (2025b). Global Location Number (GLN). https://www.gs1belu.org/nl/globallocation-number-gln
+
+46
+
+Bibliografie
+
+47
+
+GS1. (2025c). Global Trade Item Number (GTIN). https://www.gs1belu.org/nl/globaltrade-item-number-gtin
+GS1, B., & Luxembourg. (2025). Onze standaarden en oplossingen. https : / / www .
+gs1belu.org/nl/onze-standaarden-en-oplossingen
+HuggingFace. (z.d.). CodeLlama 7B Instruct - GGUF (HuggingFace, Red.). https://
+huggingface.co/TheBloke/CodeLlama-7B-Instruct-GGUF
+HuggingFace. (2024, december 19). Use Ollama with any GGUF model on Hugging
+Face Hub. https://huggingface.co/docs/hub/ollama
+IBM. (2021, oktober 19). What is a REST API? https://www.ibm.com/think/topics/
+rest-apis#:~:text=A%20REST%20API%20(also%20called,transfer%20(REST)
+%20architectural%20style.
+IBM. (2023, augustus 23). What is Retrieval-Augmented Generation (RAG)? https://
+youtube.com/watch?v=T-D1OfcDW1M&t=18s&ab_channel=IBMTechnology
+IBM. (2024, september 10). RAG vs. Fine Tuning. https : / / youtube . com / watch ? v =
+00Q0G84kq3M&ab_channel=IBMTechnology
+Jaewook Byun, D. K. (2020). Expert Systems With Applications.
+jsonld.org. (z.d.). JSON for Linking Data. https://json-ld.org/
+Kamar, E. (2024, december 13). Introducing Phi-4: Microsoft’s Newest Small Language Model Specializing in Complex Reasoning. https://techcommunity.
+microsoft.com/blog/aiplatformblog/introducing-phi-4-microsoft%E2%80%
+99s-newest-small-language-model-specializing-in-comple/4357090
+Kumar, P. (2023, oktober 4). Exploring Node.js Core Modules: A Comprehensive Guide.
+https://codewithpawan.medium.com/exploring-node-js-core-modules-acomprehensive-guide-738695e3d701
+Manandhar, G. (2025, februari 2). What is Ollama? https://geshan.com.np/blog/
+2025/02/what-is-ollama/
+Medina, A. M. (2021, april 14). Getting started with Gremlin’s API. https://www.gremlin.
+com/community/tutorials/getting-started-with-gremlins-api
+Meta. (2024, april 18). Introducing Meta Llama 3: The most capable openly available
+LLM to date. https://ai.meta.com/blog/meta-llama-3/
+Microsoft. (2024a). Phi-4: A Next-Generation Language Model from Microsoft (tech.
+rap.) (Accessed: 2025-04-06). Microsoft Research. https : / / www . microsoft .
+com/en-us/research/wp-content/uploads/2024/12/P4TechReport.pdf
+Microsoft. (2024b, augustus 14). Introduction to provisioned throughput in Azure
+Cosmos DB (M. Brown, S. Andrews e.a., Red.). https://learn.microsoft.com/enus/azure/cosmos-db/set-throughput
+Microsoft. (2024c, augustus 22). What is Azure Cosmos DB for Apache Gremlin. Verkregen november 14, 2024, van https://learn.microsoft.com/en- us/azure/
+cosmos-db/gremlin/introduction
+
+48
+
+Bibliografie
+
+Microsoft. (2024d, december 12). Create Azure Cosmos DB containers and databases with autoscale throughput (M. Brown, S. Andrews e.a., Red.). https://learn.
+microsoft.com/en-us/azure/cosmos-db/provision-throughput-autoscale
+Microsoft. (2025, mei 22). Azure Cosmos DB serverless account type. (M. Brown, S.
+Andrews e.a., Red.). https://learn.microsoft.com/en- us/azure/cosmos- db/
+serverless
+Microsoft, A. (2024, augustus 14). Common Azure Cosmos DB use cases. https : / /
+learn.microsoft.com/en-us/azure/cosmos-db/use-cases
+neo4j. (2025). What is a graph database? https://neo4j.com/docs/getting-started/
+graph-database/
+Qdrant. (z.d.). Quantization. https://qdrant.tech/documentation/guides/quantization/
+# : ~ : text = The % 20main % 20drawback % 20of % 20scalar , significant % 20for %
+20high-dimensional%20vectors.
+Rozière, B., Gehring, J., e.a. (2023, augustus 24). Code Llama: Open Foundation Models for Code (tech. rap.). Meta AI.
+Schmitt, J. (2024, december 23). Docker image vs container: What are the differences? https : / / circleci . com / blog / docker - image - vs - container / # : ~ : text =
+However,%20Docker%20lets%20you%20create,the%20same%20or%20different%
+20images.
+Thiyagarajan, K. (2024). Fine-Tuning Large Language Models with LORA: Demystifying Efficient Adaptation. https : / / medium . com / @kailash . thiyagarajan /
+fine - tuning - large - language - models - with - lora - demystifying - efficient adaptation-25fa0a389075
+Tinkerpop, A. (2023a). Apache Tinkerpop Gremlin Query Language. https://tinkerpop.
+apache.org/gremlin.html?utm_source=chatgpt.com
+Tinkerpop, A. (2023b). Data System Providers. https://tinkerpop.apache.org/providers.
+html
+Touvron, H., Martin, L., Stone, K., e.a. (2023). Llama 2: OpenFoundation and FineTuned Chat Models. Meta AI Research. Verkregen maart 30, 2025, van https:
+//scontent-bru2-1.xx.fbcdn.net/v/t39.2365-6/10000000_662098952474184_
+2584067087619170692_n.pdf?_nc_cat=105&ccb=1-7&_nc_sid=3c67a6&_nc_
+ohc=BmmKOLbj5ycQ7kNvgGN-qHv&_nc_oc=Adljp0TrqvGwUOK-fkrfe9lP6CE_
+D8cNmzUpg1uyleuGW6TEOWa56qgwQJOoNAYk9X-OApi0AqTcVif4dJKueQ3Y&_
+nc_zt=14&_nc_ht=scontent-bru2-1.xx&_nc_gid=q1qHdD-2ucJMB2QwJY0iBA&oh=
+00_AYFO039C6KdXdP1yCSvKv10kFW58MPz2dnQLoHwaxkNKmA&oe=67EF203F
+van Oers, B. (2025, februari 25). Wat is tokenisatie? https : / / aivisibilityhub . nl / ai woordenboek/wat-is-tokenisatie/
+van der Put, M. (2020, augustus 28). Azure Cosmos DB. Verkregen november 14,
+2024, van https://humandigital.nl/nieuws-en-artikelen/azure-cosmos-db/
+
+Bibliografie
+
+49
+
+Vatsya, S. (2024, december 9). Understanding Inverted Indexes: The Backbone of Efficient Search. https://dev.to/surajvatsya/understanding-inverted-indexesthe-backbone-of-efficient-search-3hoe
+Vieweger, T. (z.d.). EPCIS: Hoe zichtbaarheid van de voorraad verder gaat dan de
+winkelmuren. Verkregen november 14, 2024, van https://www.nedap-retail.
+com/nl/epcis- hoe- zichtbaarheid- van- de- voorraad- verder- gaat- dan- dewinkelmuren/
+Zeichick, A. (2023, september 19). Wat is Retrieval-Augmented Generation (RAG)?
+Oracle. https : / / www . oracle . com / nl / artificial - intelligence / generative - ai /
+retrieval-augmented-generation-rag/
+
+

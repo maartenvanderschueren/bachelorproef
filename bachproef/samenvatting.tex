@@ -43,26 +43,25 @@
 %%---------- Samenvatting -----------------------------------------------------
 % De samenvatting in de hoofdtaal van het document
 \chapter*{\IfLanguageName{dutch}{Samenvatting}{Abstract}}
-In de fabrieksomgeving van ArcelorMittal Gent worden er dagelijks verschillende staalrollen geproduceerd.
-Deze rollen worden doorheen het productieproces getraceerd door middel van een uniek nummer.
-Het is echter niet altijd duidelijk waar in het productieproces een fout is ontstaan of welke machines invloed hebben op deze fout.
-Dit kan leiden tot een inefficiënte zoektocht naar de oorzaak van de fout, wat tijd en middelen kost.
-Daarnaast is het ook niet altijd duidelijk welke machines of processen invloed hebben op de productie.
+In de fabriek van ArcelorMittal Gent worden dagelijks staalrollen geproduceerd die met een uniek nummer worden getraceerd. 
+Toch is het vaak onduidelijk waar in het proces een fout is ontstaan of welke machines hier invloed op hebben. 
+Dit leidt tot inefficiënte zoektochten, wat tijd en middelen kost.
 
-Het doel van dit onderzoek is om een methode te vinden die het mogelijk maakt snel en accuraat procesfouten of andere use cases te identificeren en te analyseren, waardoor een werknemer snel informatie kan vinden over een bepaald product of gerelateerde middelen (zoals een kraan of machine).
-Deze bachelorproef is opgesteld op aanvraag van Tracked, een bedrijf dat gespecialiseerd is in het traceren van goederen en processen.
-ArcelorMittal Gent vroeg hen om een oplossing te ontwikkelen om de procestracering te versnellen en te automatiseren, met als doel het zoeken naar informatie via verschillende afdelingen te vereenvoudigen.
+Dit onderzoek zoekt een methode om procesfouten en andere use cases snel en accuraat te identificeren, zodat medewerkers snel informatie kunnen vinden over producten of gerelateerde middelen zoals kranen of machines. 
+De bachelorproef is opgesteld in opdracht van Tracked, gespecialiseerd in het traceren van goederen en processen. 
+ArcelorMittal Gent vroeg om een oplossing die procestracering versnelt en automatiseert, met als doel het zoeken naar informatie eenvoudiger te maken.
 
-Deze bachelorproef is opgedeeld in verschillende delen. In het eerste deel wordt er een literatuurstudie uitgevoerd over de verschillende technologieën die gebruikt zullen worden in dit onderzoek.
-Hier hebben we onder andere CosmosDB en Gremlin API ontdekt die ons zullen helpen bij het efficiënt opzetten van een grafiekmodel.
-In het tweede deel gaan we dieper in op de data en het vertalen van SAP data naar een grafiekmodel in een grafiekdatabase.
-Dit doen we door gebruik te maken van een JSONLD-bestand dat opgemaakt is met schema.org, GS1 en EPCIS-events.
-Dit bestand wordt ingeladen in CosmosDB via NodeJS en Gremlin API, waardoor er een grafiekmodel ontstaat waarin we de data kunnen visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
-In het derde deel wordt er een chatbot opgesteld die de data van het grafiekmodel kan bevragen en analyseren.
-Hiervoor maken we gebruik van een iteratief proces waarbij de chatbot de vraag van de gebruiker omzet naar een Gremlin query die de data in CosmosDB bevragt.
-De chatbot kan de relevante knopen en relaties vinden, die worden verwerkt en geformatteerd in leesbare tekst.
-Daardoor kan de chatbot antwoorden geven op een vraag die de gebruiker stelt, zoals: ``Geef alle kranen met een melding op de motor''.
-Binnen het hoofdstuk van de chatbot gaan we ook dieper in op de werking van Docker en hoe we dit kunnen gebruiken om de chatbot te beheren met behulp van Elasticsearch en Ollama-modellen.
+De bachelorproef bestaat uit drie delen. 
+Het eerste deel is een literatuurstudie over technologieën als Cosmos DB en de Gremlin API, die het opzetten van een grafiekmodel mogelijk maken. 
 
-In deze bachelorproef gaan we ons focussen op een klein aantal vragen die gesteld kunnen worden, dit omdat dit niet het hoofddoel is van deze bachelorproef.
-Deze vragen zullen voornamelijk gaan over het traceren van een product en het opzoeken van foutmeldingen in het productieproces.
+Het tweede deel behandelt het vertalen van SAP-data naar een grafiekmodel in een grafiekdatabase. 
+Hiervoor wordt een JSON-LD-bestand gebruikt, opgebouwd met schema.org en GS1 EPCIS-events. 
+Dit bestand wordt via NodeJS en de Gremlin API ingeladen in Cosmos DB, wat resulteert in een grafiekmodel waarin data en relaties gevisualiseerd en geanalyseerd kunnen worden.
+
+Het derde deel beschrijft de ontwikkeling van een chatbot die dit grafiekmodel kan bevragen en analyseren. 
+De chatbot vertaalt gebruikersvragen naar Gremlin-queries die data uit Cosmos DB ophalen. 
+De relevante knopen en relaties worden omgezet in leesbare tekst, waardoor de chatbot antwoorden kan geven op vragen zoals: ``Geef alle kranen met een melding op de motor.''
+Dit hoofdstuk gaat ook in op het gebruik van Docker voor het beheren van de chatbot, in combinatie met Elasticsearch en Ollama-modellen.
+
+De focus ligt op een beperkte set vragen, omdat een uitgebreide vragenset niet het hoofddoel is. 
+Wel wordt een basis gelegd voor een chatbot die vragen over het productieproces van ArcelorMittal Gent kan beantwoorden, vooral gericht op producttracering en het opsporen van foutmeldingen.

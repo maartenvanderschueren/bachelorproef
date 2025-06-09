@@ -4,21 +4,54 @@
 
 \chapter{Conclusie}%
 \label{ch:conclusie}
-In deze bachelorproef werd onderzocht hoe we gebruik konden maken van een grafiekmodel en een Large Language Model (LLM) om gegevens binnen het staalproductieproces van ArcelorMittal Gent efficiënt op te vragen. 
-Het doel was om een proof of concept te ontwikkelen die niet alleen de traceerbaarheid van productieprocessen verbetert, maar ook de operationele efficiëntie verhoogt door middel van een chatbot die procesvragen kan beantwoorden.
-Door de SAP boomstructuur om te zetten naar een JSON-LD formaat volgens GS1-standaarden, en deze te structureren in een grafiekdatabase (CosmosDB), werd een stevige basis gelegd voor het traceren van productieprocessen.
-Vervolgens werd een chatbot ontwikkeld die gebruik maakt van Gremlin queries en Retrieval Augmented Generation (RAG) om procesvragen te vertalen naar begrijpelijke antwoorden.
-Door gebruik te maken van modellen zoals Code Llama voor querygeneratie en Phi-4 voor natuurlijke taalverwerking, kon een performante oplossing worden opgezet die uit te bereiden is en bruikbaar voor andere use-cases binnen de industrie.
+In deze bachelorproef is onderzocht hoe een combinatie van een grafiekmodel en een Large Language Model (LLM) kan worden ingezet om gegevens binnen het staalverwerkingsproces van ArcelorMittal Gent efficiënt op te vragen.
+Het doel was een proof of concept te ontwikkelen die niet alleen de traceerbaarheid van productieprocessen verbetert, maar ook de operationele efficiëntie verhoogt door middel van een chatbot die procesvragen kan beantwoorden.
+Door de SAP-boomstructuur om te zetten naar JSON-LD-formaat volgens GS1-standaarden en deze te structureren in een grafiekdatabase (Cosmos DB), werd een stevige basis gelegd voor het traceren van productieprocessen.
+Vervolgens werd een chatbot ontwikkeld die gebruikmaakt van Gremlin-queries en Retrieval Augmented Generation (RAG) om procesvragen te vertalen naar begrijpelijke antwoorden.
+Met modellen zoals Code Llama voor querygeneratie en Phi-4 voor natuurlijke taalverwerking is een performante oplossing opgezet die uitbreidbaar is en bruikbaar voor andere use-cases binnen de industrie.
 
-In dit ondezoek ben ik vooral op zoek gegaan naar combinaties van technieken die het mogelijk maken om de traceerbaarheid van productieprocessen te verbeteren.
-De proof of concept die werd ontwikkeld, toont aan dat het mogelijk is om een chatbot te creëren die vragen kan beantwoorden over productieprocessen door gebruik te maken van dit grafiekmodel en een LLM.\@
-Mits de juiste finetuning en eventuele hertraining van de modellen, kan deze oplossing verder worden uitgebreid en geoptimaliseerd voor andere toepassingen binnen de industrie.
-Naast de technische aspecten, is het ook belangrijk om de gebruikerservaring in overweging te nemen.
-De chatbot is een API die kan worden geïntegreerd in bestaande systemen, waardoor het voor gebruikers eenvoudig is om toegang te krijgen tot de informatie die ze nodig hebben.
+In dit onderzoek is vooral gezocht naar combinaties van technieken die de traceerbaarheid van productieprocessen verbeteren.
+De ontwikkelde proof of concept toont aan dat het mogelijk is een chatbot te creëren die vragen kan beantwoorden over productieprocessen door gebruik te maken van dit grafiekmodel en een LLM.\@
+Met de juiste finetuning en eventuele hertraining van de modellen kan deze oplossing verder worden uitgebreid en geoptimaliseerd voor andere toepassingen binnen de industrie.
+Naast de technische aspecten is het belangrijk de gebruikerservaring mee te nemen.
+De chatbot functioneert als een API die geïntegreerd kan worden in bestaande systemen, waardoor gebruikers eenvoudig toegang krijgen tot de benodigde informatie.
 De proof of concept biedt een solide basis voor verdere ontwikkeling en implementatie binnen ArcelorMittal Gent en mogelijk ook andere bedrijven in de staalindustrie.
-Naast het opzetten van een frontend, kan er ook gekeken worden naar het maken van een gremlin specifieke LLM die getrained wordt met LoRA op de mogelijke syntax van gremlin queries.
-In deze thesis hebben we daar niet de tijd en resources voor gehad, maar het lijkt ons een interessante richting om verder te onderzoeken.
 
+\section{Resultaten}
+De resultaten van dit eerste onderzoek zijn veelbelovend. Er is aangetoond dat het mogelijk is om een grafiekmodel op te zetten met behulp van Cosmos DB en de Gremlin API, en dat dit model kan worden gebruikt om data te visualiseren en te analyseren.
+Daarnaast is een proof of concept ontwikkeld van een chatbot die vragen kan beantwoorden over het productieproces van ArcelorMittal Gent.
+Een belangrijk knelpunt is dat het CodeLlama-model niet altijd de juiste Gremlin-query genereert, waardoor handmatig queries toegevoegd moeten worden aan het JSON-bestand voor Elasticsearch.
+Dit kan opgelost worden door het model verder te trainen met LoRA (zoals besproken in hoofdstuk~\ref{sec:LORA}), maar vanwege beperkte tijd en resources is dit niet uitgevoerd in deze bachelorproef.
+
+In de volgende \href{https://youtu.be/D4-bSRYDLWM}{demo video} is een korte demonstratie te zien van de chatbot en hoe deze werkt met de data die in Cosmos DB is opgezet.\@
+Aan het begin heeft het Ollama-model tijd nodig om een vraag te beantwoorden, omdat Ollama standby staat maar het model nog niet geladen is.
+Pas zodra de vraag wordt gesteld, wordt het model geladen en kan de chatbot de vraag beantwoorden.
+Bij een tweede vraag verloopt dit veel sneller, omdat het model dan al geladen is en de chatbot direct kan antwoorden.
+In figuur~\ref{fig:demo} is een screenshot te zien van de demo video.
+
+\subsection{Voordelen}
+De voordelen van het gebruik van een tijdelijk grafiekmodel zijn onder andere:
+\begin{itemize}
+    \item Het is mogelijk om data te visualiseren en analyseren door de relaties tussen de verschillende producten en processen.
+    \item Het is mogelijk om snel vragen van gebruikers te beantwoorden over het productieproces van ArcelorMittal Gent.
+    \item Verhoogde traceerbaarheid van productieprocessen, waardoor het eenvoudiger wordt om problemen te identificeren en op te lossen.
+    \item Het is mogelijk om de chatbot eenvoudig op te zetten en te beheren, zonder zorgen over de onderliggende infrastructuur.
+    \item Door gebruik te maken van Elasticsearch kan er sneller een antwoord geven op meest gestelde vragen, waardoor de chatbot sneller en efficiënter wordt.
+\end{itemize}
+
+\subsection{Nadelen}
+De nadelen of problemen die ondervonden zijn bij de huidige werkwijze zijn onder andere:
+\begin{itemize}
+    \item Het CodeLlama model genereert niet altijd de juiste Gremlin query, waardoor ze handmatig moeten worden toegevoegd aan het JSON bestand voor Elasticsearch.
+    \item De snelheid van de chatbot is afhankelijk van Ollama die een antwoord of query moet genereren, waardoor het soms langer duurt om een antwoord te krijgen indien de query niet in Elasticsearch aanwezig is.
+\end{itemize}
+
+\section{Toekomstig onderzoek}
+Om de chatbot verder uit te breiden en te verbeteren, kunnen verschillende zaken worden aangepakt.
+Allereerst kan gekeken worden naar het finetunen van het CodeLlama-model met LoRA, zoals besproken in~\ref{sec:LORA}, om de kwaliteit van de gegenereerde Gremlin-queries te verbeteren.
+Daarnaast kunnen er nog meer prestatieoptimalisaties worden doorgevoerd om de snelheid van de chatbot te verhogen.
+Ook kunnen rechten worden toegevoegd, zodat bepaalde gebruikersgroepen alleen specifieke vragen kunnen stellen of antwoorden kunnen ontvangen.
+Daarnaast kunnen deze rechten worden gebruikt om DELETE-, ADD- en UPDATE-acties toe te voegen, waardoor de chatbot multifunctioneel wordt.
 % TODO: Trek een duidelijke conclusie, in de vorm van een antwoord op de
 % onderzoeksvra(a)g(en). Wat was jouw bijdrage aan het onderzoeksdomein en
 % hoe biedt dit meerwaarde aan het vakgebied/doelgroep? 

@@ -1,0 +1,10 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{p}{\PYGZob{}}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}id\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}name\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Machine 1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}label\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}machine 1\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}level\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+m+mf}{3}\PYG{p}{,}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}parentId\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}2\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{     }\PYG{l+s+s2}{\PYGZdq{}status\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}In Use, Alarm\PYGZdq{}}
+\PYG{p}{\PYGZcb{}}
+\end{MintedVerbatim}

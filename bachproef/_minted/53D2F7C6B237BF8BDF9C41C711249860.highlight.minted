@@ -1,0 +1,26 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{Gremlin}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{require}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}gremlin\PYGZsq{}}\PYG{p}{)}\PYG{p}{;}
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{config}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{n+nx}{require}\PYG{p}{(}\PYG{l+s+s1}{\PYGZsq{}../config/config\PYGZsq{}}\PYG{p}{)}\PYG{p}{;}
+
+\PYG{k+kd}{let}\PYG{+w}{ }\PYG{n+nx}{client}\PYG{p}{;}
+
+\PYG{k+kd}{function}\PYG{+w}{ }\PYG{n+nx}{getClient}\PYG{p}{(}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{     }\PYG{k}{if}\PYG{+w}{ }\PYG{p}{(}\PYG{o}{!}\PYG{n+nx}{client}\PYG{p}{)}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{          }\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{authenticator}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Gremlin}\PYG{p}{.}\PYG{n+nx}{driver}\PYG{p}{.}\PYG{n+nx}{auth}\PYG{p}{.}\PYG{n+nx}{PlainTextSaslAuthenticator}\PYG{p}{(}
+\PYG{+w}{               }\PYG{l+s+sb}{`}\PYG{l+s+sb}{/dbs/}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{config}\PYG{p}{.}\PYG{n+nx}{database}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{/colls/}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{config}\PYG{p}{.}\PYG{n+nx}{collection}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{`}\PYG{p}{,}\PYG{+w}{ }\PYG{n+nx}{config}\PYG{p}{.}\PYG{n+nx}{primaryKey}
+\PYG{+w}{          }\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{          }\PYG{n+nx}{client}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{o+ow}{new}\PYG{+w}{ }\PYG{n+nx}{Gremlin}\PYG{p}{.}\PYG{n+nx}{driver}\PYG{p}{.}\PYG{n+nx}{Client}\PYG{p}{(}
+\PYG{+w}{               }\PYG{n+nx}{config}\PYG{p}{.}\PYG{n+nx}{endpoint}\PYG{p}{,}
+\PYG{+w}{               }\PYG{p}{\PYGZob{}}
+\PYG{+w}{                    }\PYG{n+nx}{authenticator}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n+nx}{traversalsource}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}g\PYGZsq{}}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n+nx}{rejectUnauthorized}\PYG{o}{:}\PYG{+w}{ }\PYG{k+kc}{true}\PYG{p}{,}
+\PYG{+w}{                    }\PYG{n+nx}{mimeType}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s1}{\PYGZsq{}application/vnd.gremlin\PYGZhy{}v2.0+json\PYGZsq{}}
+\PYG{+w}{               }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{          }\PYG{p}{)}\PYG{p}{;}
+\PYG{+w}{     }\PYG{p}{\PYGZcb{}}
+\PYG{+w}{     }\PYG{k}{return}\PYG{+w}{ }\PYG{n+nx}{client}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}
+
+\PYG{n+nx}{module}\PYG{p}{.}\PYG{n+nx}{exports}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{\PYGZob{}}\PYG{+w}{ }\PYG{n+nx}{getClient}\PYG{+w}{ }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\end{MintedVerbatim}

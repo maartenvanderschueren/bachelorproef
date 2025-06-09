@@ -5,15 +5,17 @@
 \chapter{\IfLanguageName{dutch}{Inleiding}{Introduction}}%
 \label{ch:inleiding}
 
-In de moderne industriële wereld is efficiëntie cruciaal, vooral binnen ingewikkelde toeleveringsketens zoals die van ArcelorMittal Gent. 
+In de moderne industriële wereld is efficiëntie en performantie cruciaal, vooral binnen ingewikkelde toeleveringsketens zoals die van ArcelorMittal Gent. 
 Deze bachelorproef richt zich op het verbeteren van klachtenafhandeling en preventie van fouten, door gebruik te maken van innovatieve technologieën zoals grafiekmodellering en large language models (LLMs). 
-Door traceringsdata om te zetten naar een grafiekmodel en dit te koppelen aan een LLM, willen we bedrijven in staat stellen sneller en nauwkeuriger de oorzaken van problemen te achterhalen. 
+Door traceringsdata om te zetten naar een grafiekmodel en dit te koppelen aan een LLM, kunnen bedrijven in staat gesteld worden om sneller en nauwkeuriger de oorzaken van problemen te achterhalen. 
+
 Dit onderzoek, uitgevoerd in samenwerking met Tracked, een bedrijf van de Cronos groep gespecialiseerd in traceringsdata, heeft als doel om schaalbare en performante oplossingen te bieden die de efficiëntie en klanttevredenheid optimaliseren.
 Voor dit onderzoek maken we gebruik van een installatieboom die alle onderdelen van het productieproces bevat.
+
 Let op dat de data die we gebruiken omtrent dit proces louter fictief is en enkel dient ter illustratie van de werking van de verschillende technologieën.
 In~\ref{sec:dataopstelling} wordt er meer uitleg gegeven over de data die we gebruiken aangezien we niet de originele data hebben gebruikt om dit onderzoek te volbrengen.
-De reden hiervoor is dat de originele data vertrouwelijk is en niet openbaar gemaakt kan worden. 
-Daarnaast is er ook gevraagd om een minim aantal aan code weer te geven in de thesis, dit om mogelijke datalekken zo veel mogelijk te voorkomen.
+De reden hiervoor is dat de originele data vertrouwelijk is en niet openbaar kan worden gemaakt. 
+Daarnaast is er ook gevraagd om een minim aantal code weer te geven in de thesis, dit om de data zo confidentieel mogelijk te houden.
 
 \section{\IfLanguageName{dutch}{Probleemstelling}{Problem Statement}}%
 \label{sec:probleemstelling}
@@ -24,30 +26,51 @@ Deze processen omvatten onder andere de productie, verpakking en logistiek.
 Elke afdeling heeft specifieke processen en datamodellen, wat het analyseren en onderzoeken van gegevens over afdelingen heen zeer complex en tijdrovend maakt. 
 Dit leidt tot inefficiënties in de klachtenafhandeling of onderhoudsprocessen, en verhoogt de operationele kosten. 
 Er is behoefte aan een schaalbare en performante oplossing die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken van problemen te achterhalen, waardoor duur en tijdrovend handmatig werk wordt verminderd.
-Dit is een erkend probleem voor zowel kleine bedrijven (zoals bijvoorbeeld kleine ondernemingen) of delen van grote bedrijven (zoals in ons geval ArcelorMittal), waarbij het staal een grote weg aflegt en niet alleen in Gent blijft.
-
+Dit is een erkend probleem voor zowel kleine bedrijven (zoals bijvoorbeeld kleine ondernemingen) en zeker bij grote bedrijven (zoals in dit geval ArcelorMittal), waarbij het staal een grote weg aflegt en niet alleen in Gent blijft.
+Dit staal wordt namelijk geproduceerd, verwerkt en gebruikt in verschillende regio's, daarnaast zijn er ook verschillende logistieke middelen die het staal vervoeren naar de klant (zoals een boot, trein of vrachtwagen).
 \section{\IfLanguageName{dutch}{Onderzoeksvraag}{Research question}}%
 \label{sec:onderzoeksvraag}
 
 % Wees zo concreet mogelijk bij het formuleren van je onderzoeksvraag. Een onderzoeksvraag is trouwens iets waar nog niemand op dit moment een antwoord heeft (voor zover je kan nagaan). Het opzoeken van bestaande informatie (bv. ``welke tools bestaan er voor deze toepassing?'') is dus geen onderzoeksvraag. Je kan de onderzoeksvraag verder specifiëren in deelvragen. Bv.~als je onderzoek gaat over performantiemetingen, dan 
-De voornaamste onderzoeksvraag luidt als volgt: `Hoe kunnen we efficiënt en snel grafiekmodellering hanteren en met behulp van een large language model (LLM) een chatbot ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen, ter ondersteuning van klachtenafhandeling bij productfouten\texttt{?}`
+De voornaamste onderzoeksvraag luidt als volgt: \emph{`Hoe kunnen we efficiënt en snel grafiekmodellering toepassen en met behulp van een large language model (LLM) een chatbot ontwikkelen die in staat is om het waar, wanneer, wat en hoe van gebeurtenissen binnen een proces vast te stellen ter ondersteuning van klachtenafhandeling bij productfouten\texttt{?}}`
+
 Daarnaast zijn belangrijke deelvragen:
 \begin{itemize}
-    \item Hoe kunnen we SAP data omzetten naar een grafiekmodel?
+    \item Hoe kunnen we SAP-data omzetten naar een grafiekmodel?
     \item Hoe maken we gebruik van de GS1 standaarden om de data correct te structureren?
     \item Hoe kunnen we een LLM gebruiken om gebeurtenissen binnen een proces vast te stellen?
-    \item Hoe kunnen we een chatbot ontwikkelen die de LLM kan bevragen en een gepast antwoord kan geven op de gestelde vraag?
+    \item Hoe kunnen we een chatbot ontwikkelen die een LLM kan bevragen en een gepast antwoord kan geven op de gestelde vraag?
 \end{itemize}
 \section{\IfLanguageName{dutch}{Onderzoeksdoelstelling}{Research objective}}%
 \label{sec:onderzoeksdoelstelling}
 
 % Wat is het beoogde resultaat van je bachelorproef? Wat zijn de criteria voor succes? Beschrijf die zo concreet mogelijk. Gaat het bv.\ om een proof-of-concept, een prototype, een verslag met aanbevelingen, een vergelijkende studie, enz.
-De doelstelling van deze bachelorproef is om een schaalbare en performante oplossing te ontwikkelen die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken van problemen binnen hun toeleveringsketen te achterhalen. 
-Dit wordt bereikt door het toepassen van grafiekmodellering op traceringsdata en het trainen van een large language model (LLM). 
+De doelstelling van deze bachelorproef is om een schaalbare en performante oplossing te ontwikkelen die bedrijven in staat stelt sneller en nauwkeuriger de oorzaken van problemen binnen hun toeleveringsketen te achterhalen.
+Dit wordt bereikt door het toepassen van grafiekmodellering op traceringsdata en het gebruiken van een large language model (LLM). 
 Het uiteindelijke doel is om de operationele efficiëntie te verbeteren en de klanttevredenheid te optimaliseren door een efficiënte klachtenafhandeling mogelijk te maken.
 
-Binnen de doelstelling van deze bachelorproef wordt er gebruik gemaakt fictieve data gebasseerd op de boomstructuur van ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. 
-Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de motor de afgelopen 24 uur\texttt{.}'' en dat de chatbot dit kan beantwoorden.
+Binnen de doelstelling van deze bachelorproef wordt er nogmaals benadrukt dat er gebruik gemaakt wordt van fictieve data gebasseerd op de boomstructuur van ArcelorMittal waarbij alle afdelingen en werktuigen staan opgelijst. 
+Daarbij is het doel dat we kunnen vragen: \emph{``Geef alle machines met een alarm op de motor.''}, en dat de chatbot dit kan beantwoorden.
+
+\section{Databeschrijving vooraf}\label{sec:dataopstelling}
+Vooraleer er aan de slag gegaan wordt met deze bachelorproef, is het belangrijk om te weten welke data precies beschikbaar is en hoe die eruitziet.
+
+Aan het begin van deze thesis werd er een SAP-boomstructuur in JSON-formaat aangeleverd, die alle onderdelen van het productieproces bevat.
+Dit bestand is enorm groot (meer dan 50.000 JSON-objecten) en bevat bovendien een groot aantal eigenschappen per object.
+Door deze complexiteit is het moeilijk om meteen met de volledige dataset te werken tijdens de ontwikkeling van de chatbot.
+
+Om sneller te kunnen testen en ontwikkelen, wordt er daarom gekozen voor een mock dataset.
+Deze heeft dezelfde structuur als de originele data, maar maakt gebruik van fictieve sleutel-waarde paren en een veel kleiner aantal records.
+Hierdoor kan de initiële opzet en het testen uitgevoerd worden zonder dat telkens de volledige dataset moet worden ingeladen.
+
+Voor de verdere ontwikkeling van het project maakt het geen verschil of de mock-data of de echte data wordt gebruikt.
+De scripts in zowel JavaScript als Python zijn generiek opgebouwd en functioneren zolang de datastructuur ongewijzigd blijft.
+
+Doorgaans start het proces met een JSON-bestand dat via een Python-script wordt omgezet naar JSON-LD.\@
+Dit JSON-LD-bestand kan vervolgens rechtstreeks in Cosmos DB worden ingeladen.
+
+In figuur~\ref{fig:graphmodel} is een voorbeeld te zien van hoe de mock-data eruitziet in grafiekvorm.
+
 \section{\IfLanguageName{dutch}{Opzet van deze bachelorproef}{Structure of this bachelor thesis}}%
 \label{sec:opzet-bachelorproef}
 
@@ -56,13 +79,16 @@ Daarbij is het doel dat we kunnen vragen: ``Geef alle kranen met een alert op de
 % die je kan aanvullen/aanpassen in functie van je eigen tekst.
 De bachelorproef is als volgt opgebouwd:
 
-Eerst en vooral in hoofdstuk~\ref{ch:stand-van-zaken} wordt een overzicht gegeven over welke technologieën we gebruiken, zoals CosmosDB, Gremlin API en schema.org.
+Eerst en vooral, in hoofdstuk~\ref{ch:stand-van-zaken} wordt er een overzicht gegeven over welke technologieën hiervoor gebruikt zijn.
 Daarnaast wordt er ook een overzicht gegeven van de literatuur die relevant is voor dit onderzoek.
 
-Als laatste wordt er in hoofdstuk~\ref{ch:methodologie} de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
-Zo leggen we uit hoe we de SAP data omzetten naar een grafiekmodel, hoe we gebruik maken van een LLM en deze implementeren via een REST API.\@
-Dit alles wordt opgebouwd in docker om flexibel te zijn met de onderliggende infrastructuur.
+Daarna wordt er in hoofdstuk~\ref{ch:methodologie} de methodologie toegelicht en worden de gebruikte onderzoekstechnieken besproken om een antwoord te kunnen formuleren op de onderzoeksvragen.
+Zo wordt besproken hoe de SAP-data kan worden omgezet naar een grafiekmodel, waarom er gebruik wordt gemaakt van een LLM en hoe deze wordt geïmplementeerd via een REST-API.\@
+Dit alles wordt opgebouwd in Docker om flexibel te zijn met de onderliggende infrastructuur, waardoor de chatbot eenvoudig kan worden beheerd.
 
 % TODO: Vul hier aan voor je eigen hoofstukken, één of twee zinnen per hoofdstuk
 
-Tot slot, In Hoofdstuk~\ref{ch:conclusie}, wordt er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast bespreken we een aantal mogelijke uitbereidingen van dit onderzoek.
+Tot slot, in hoofdstuk~\ref{ch:conclusie}, wordt er een antwoord geformuleerd op de onderzoeksvragen en geven we een conclusie over deze thesis. Daarnaast worden een aantal mogelijke uitbereidingen voor dit onderzoek besproken.
+
+
+Indien er gerefereerd wordt naar een bijlage, maar verder geen uitleg over gegeven wordt, kan je die bijlage vinden in hoofdstuk~\ref{ch:Bijlagen}.

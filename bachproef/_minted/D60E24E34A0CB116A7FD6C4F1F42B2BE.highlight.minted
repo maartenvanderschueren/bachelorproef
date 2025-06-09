@@ -1,0 +1,13 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k}{if} \PYG{n}{response}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hits}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hits}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{:}
+   \PYG{n}{best\PYGZus{}hit} \PYG{o}{=} \PYG{n}{response}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hits}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{hits}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{[}\PYG{l+m+mi}{0}\PYG{p}{]}
+   \PYG{n}{score} \PYG{o}{=} \PYG{n}{best\PYGZus{}hit}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}score}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}
+   \PYG{k}{if} \PYG{n}{score} \PYG{o}{\PYGZgt{}}\PYG{o}{=} \PYG{l+m+mi}{15}\PYG{p}{:}
+       \PYG{n}{query} \PYG{o}{=} \PYG{n}{best\PYGZus{}hit}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}source}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{antwoord}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}
+       \PYG{k}{return} \PYG{n}{query}
+   \PYG{k}{else} \PYG{k}{if} \PYG{n}{score} \PYG{o}{\PYGZgt{}}\PYG{o}{=} \PYG{l+m+mi}{12}\PYG{p}{:}
+       \PYG{n}{previous\PYGZus{}query} \PYG{o}{=} \PYG{n}{best\PYGZus{}hit}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{\PYGZus{}source}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}\PYG{p}{[}\PYG{l+s+s2}{\PYGZdq{}}\PYG{l+s+s2}{antwoord}\PYG{l+s+s2}{\PYGZdq{}}\PYG{p}{]}  \PYG{c+c1}{\PYGZsh{} Sla de vorige query op}
+       \PYG{k}{if} \PYG{n}{previous\PYGZus{}query}\PYG{p}{:}
+           \PYG{n}{query} \PYG{o}{=} \PYG{n}{generate\PYGZus{}query\PYGZus{}from\PYGZus{}llm}\PYG{p}{(}\PYG{n}{question}\PYG{p}{,} \PYG{n}{context}\PYG{p}{,} \PYG{n}{previous\PYGZus{}query}\PYG{p}{,} \PYG{n}{error}\PYG{p}{)}
+           \PYG{k}{return} \PYG{n}{query}
+\end{MintedVerbatim}

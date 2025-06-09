@@ -1,0 +1,12 @@
+\begin{MintedVerbatim}[commandchars=\\\{\}]
+\PYG{k+kd}{const}\PYG{+w}{ }\PYG{n+nx}{node}\PYG{+w}{ }\PYG{o}{=}\PYG{+w}{ }\PYG{p}{\PYGZob{}}
+\PYG{+w}{      }\PYG{l+s+s2}{\PYGZdq{}@id\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+sb}{`}\PYG{l+s+sb}{am:}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{id}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{`}\PYG{p}{,}
+\PYG{+w}{      }\PYG{l+s+s2}{\PYGZdq{}@type\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{n+nx}{level}\PYG{+w}{ }\PYG{o}{\PYGZgt{}}\PYG{+w}{ }\PYG{l+m+mf}{3}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Product\PYGZdq{}}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{l+s+s2}{\PYGZdq{}Place\PYGZdq{}}\PYG{p}{,}
+\PYG{+w}{      }\PYG{l+s+s2}{\PYGZdq{}name\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{n+nx}{name}\PYG{p}{,}
+\PYG{+w}{      }\PYG{l+s+s2}{\PYGZdq{}label\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{n+nx}{label}\PYG{+w}{ }\PYG{o}{||}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{p}{,}
+\PYG{+w}{      }\PYG{l+s+s2}{\PYGZdq{}containedInPlace\PYGZdq{}}\PYG{o}{:}\PYG{+w}{ }\PYG{n+nx}{parentId}\PYG{+w}{ }\PYG{o}{?}\PYG{+w}{ }\PYG{l+s+sb}{`}\PYG{l+s+sb}{am:}\PYG{l+s+si}{\PYGZdl{}\PYGZob{}}\PYG{n+nx}{parentId}\PYG{l+s+si}{\PYGZcb{}}\PYG{l+s+sb}{`}\PYG{+w}{ }\PYG{o}{:}\PYG{+w}{ }\PYG{k+kc}{null}\PYG{p}{,}
+\PYG{+w}{      }\PYG{p}{...}\PYG{n+nx}{cleanedItem}\PYG{p}{,}
+\PYG{+w}{  }\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\PYG{+w}{  }\PYG{n+nx}{nodes}\PYG{p}{.}\PYG{n+nx}{push}\PYG{p}{(}\PYG{n+nx}{node}\PYG{p}{)}\PYG{p}{;}
+\PYG{p}{\PYGZcb{}}\PYG{p}{;}
+\end{MintedVerbatim}
